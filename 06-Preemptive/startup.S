@@ -4,81 +4,81 @@
 .global vectors_start
 .global vectors_end
 
-.EQU USR_MODE, 0x10
-.EQU SYS_MODE, 0x1F
-.EQU SVC_MODE, 0x13
-.EQU IRQ_MODE, 0x12
-.EQU INT_OFF, 0xC0
+.equ USR_MODE, 0x10
+.equ SYS_MODE, 0x1F
+.equ SVC_MODE, 0x13
+.equ IRQ_MODE, 0x12
+.equ INT_OFF, 0xC0
 
 vectors_start:
-	LDR PC, reset_handler_addr
-	LDR PC, undef_handler_addr
-	LDR PC, swi_handler_addr
-	LDR PC, prefetch_abort_handler_addr
-	LDR PC, data_abort_handler_addr
-	B .
-	LDR PC, irq_handler_addr
-	LDR PC, fiq_handler_addr
+	ldr pc, reset_handler_addr
+	ldr pc, undef_handler_addr
+	ldr pc, swi_handler_addr
+	ldr pc, prefetch_abort_handler_addr
+	ldr pc, data_abort_handler_addr
+	b .
+	ldr pc, irq_handler_addr
+	ldr pc, fiq_handler_addr
 
-reset_handler_addr: .word reset_handler
-undef_handler_addr: .word undef_handler
-swi_handler_addr: .word swi_handler
-prefetch_abort_handler_addr: .word prefetch_abort_handler
-data_abort_handler_addr: .word data_abort_handler
-irq_handler_addr: .word irq_handler
-fiq_handler_addr: .word fiq_handler
+reset_handler_addr:		.word reset_handler
+undef_handler_addr:		.word undef_handler
+swi_handler_addr:		.word swi_handler
+prefetch_abort_handler_addr:	.word prefetch_abort_handler
+data_abort_handler_addr:	.word data_abort_handler
+irq_handler_addr:		.word irq_handler
+fiq_handler_addr:		.word fiq_handler
 
 vectors_end:
 
 reset_handler:
 	/* set Supervisor stack */
-	MOV sp, #0x80000
+	mov sp, #0x80000
 	
-	MSR CPSR_c, #INT_OFF|SYS_MODE
-	MOV sp, #0x40000
+	msr CPSR_c, #(INT_OFF | SYS_MODE)
+	mov sp, #0x40000
 	
-	MSR CPSR_c, #INT_OFF|IRQ_MODE
-	MOV sp, #0x10000
+	msr CPSR_c, #(INT_OFF | IRQ_MODE)
+	mov sp, #0x10000
 	
-	MSR CPSR_c,#INT_OFF|SVC_MODE
+	msr CPSR_c,#(INT_OFF | SVC_MODE)
 	
 	/* Copy table vector to address 0 */
-	BL copy_vectors
+	bl copy_vectors
 
 	/* jump to main */
-	B c_entry
+	b c_entry
 	
 irq_handler:
 	/* Save the return value */
-	SUB lr,lr,#4
-	STMFD sp!, {r0-ip, lr}^ /* Save the user task context */
-	MOV r0, sp
-	BL saveTaskContext
+	sub lr, lr, #4
+	stmfd sp!, {r0-ip, lr}^ /* Save the user task context */
+	mov r0, sp
+	bl saveTaskContext
 
-	BL event_irq_handler
+	bl event_irq_handler
 
 	/* Load kernel state */
-	MSR CPSR_c,SVC_MODE
-	LDMFD sp!,{r1-r12,pc}
-	NOP
+	msr CPSR_c,SVC_MODE
+	ldmfd sp!, {r1-r12, pc}
+	nop
 	
 swi_handler:
-	MOV ip, r0
+	mov ip, r0
 
 	/* Save user state */
-	MSR CPSR_c, #INT_OFF|SYS_MODE
-	STMFD sp!,{r0-r12,lr}
-	NOP
+	msr CPSR_c, #(INT_OFF | SYS_MODE)
+	stmfd sp!, {r0-r12, lr}
+	nop
 	mov r0, sp
-	BL saveTaskContext
-	NOP
+	bl saveTaskContext
+	nop
 
-	MOV r0, ip
-	BL event_swi_handler
+	mov r0, ip
+	bl event_swi_handler
 
 	/* Load kernel state */
-	MSR CPSR_c,SVC_MODE
-	LDMFD sp!,{r1-r12,pc}
-	NOP
+	msr CPSR_c, SVC_MODE
+	ldmfd sp!, {r1-r12, pc}
+	nop
 
 .end
