@@ -7,6 +7,8 @@ Prerequisites
 
 Steps
 -----
+* `01-HelloWorld`
+  - Use ARM PrimeCell PL011 UART0 to print trivial greetings
 
 Building and Verification
 -------------------------
