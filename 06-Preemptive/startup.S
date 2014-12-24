@@ -13,7 +13,7 @@
 vectors_start:
 	ldr pc, reset_handler_addr
 	ldr pc, undef_handler_addr
-	ldr pc, swi_handler_addr
+	ldr pc, svc_handler_addr
 	ldr pc, prefetch_abort_handler_addr
 	ldr pc, data_abort_handler_addr
 	b .
@@ -22,7 +22,7 @@ vectors_start:
 
 reset_handler_addr:		.word reset_handler
 undef_handler_addr:		.word undef_handler
-swi_handler_addr:		.word swi_handler
+svc_handler_addr:		.word svc_handler
 prefetch_abort_handler_addr:	.word prefetch_abort_handler
 data_abort_handler_addr:	.word data_abort_handler
 irq_handler_addr:		.word irq_handler
@@ -62,7 +62,7 @@ irq_handler:
 	ldmfd sp!, {r1-r12, pc}
 	nop
 	
-swi_handler:
+svc_handler:
 	mov ip, r0
 
 	/* Save user state */
@@ -74,7 +74,7 @@ swi_handler:
 	nop
 
 	mov r0, ip
-	bl event_swi_handler
+	bl event_svc_handler
 
 	/* Load kernel state */
 	msr CPSR_c, SVC_MODE

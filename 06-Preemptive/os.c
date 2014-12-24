@@ -145,7 +145,7 @@ void event_irq_handler(void)
 	VIC_ENABLE_INT = 0x00000010;	/* Enable Timer01 interrupt */
 }
 
-void event_swi_handler(int taskNumber)
+void event_svc_handler(int taskNumber)
 {
 	char printable[] = { taskNumber + '0', '\0' };
 	print_uart0("Task number that called the syscall : ");
