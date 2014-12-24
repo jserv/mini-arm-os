@@ -1,5 +1,5 @@
-.global swi_entry
-swi_entry:
+.global svc_entry
+svc_entry:
 	/* Save user state */
 	msr CPSR_c, #0xDF /* System mode */
 	push {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, fp, ip, lr}

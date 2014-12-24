@@ -1,4 +1,4 @@
 .global syscall
 syscall:
-	swi 0
+	svc 0
 	bx lr
