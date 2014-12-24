@@ -21,7 +21,7 @@ startup.o: startup.S
 qemu: $(TARGET)
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
-	qemu-system-arm -M versatilepb -m 128M -nographic -kernel $(TARGET)
+	qemu-system-arm -M versatilepb -cpu arm926 -m 128M -nographic -kernel $(TARGET)
 
 clean:
 	rm -f *.o *.bin *.elf
