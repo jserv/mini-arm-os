@@ -17,6 +17,8 @@ Steps
   - Two user tasks are interatively switching
 * `05-TimerInterrupt`
   - Use ARM timer peripheral for future scheduler implementation
+* `06-Preemptive`
+  - Basic preemptive scheduling
 
 Building and Verification
 -------------------------
