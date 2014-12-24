@@ -11,6 +11,8 @@ Steps
   - Use ARM PrimeCell PL011 UART0 to print trivial greetings
 * `02-ContextSwitch-1`
   - Basic switch between user and kernel mode
+* `03-ContextSwitch-2`
+  - system call is introduced as an effective method to return to kernel
 
 Building and Verification
 -------------------------
