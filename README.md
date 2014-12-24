@@ -15,6 +15,8 @@ Steps
   - system call is introduced as an effective method to return to kernel
 * `04-Multitasking`
   - Two user tasks are interatively switching
+* `05-TimerInterrupt`
+  - Use ARM timer peripheral for future scheduler implementation
 
 Building and Verification
 -------------------------
