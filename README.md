@@ -24,3 +24,7 @@ Building and Verification
 -------------------------
 $ make
 $ make qemu
+
+Reference
+---------
+* [Baking Pi – Operating Systems Development](http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/)
