@@ -13,6 +13,8 @@ Steps
   - Basic switch between user and kernel mode
 * `03-ContextSwitch-2`
   - system call is introduced as an effective method to return to kernel
+* `04-Multitasking`
+  - Two user tasks are interatively switching
 
 Building and Verification
 -------------------------
