@@ -1,3 +1,7 @@
+/*
+ * http://infocenter.arm.com/help/topic/com.arm.doc.dui0224i/I1042232.html
+ */
+
 /* IRQ STATUS REGISTER -> shows the active interrupt */
 #define VIC_BASE_ADDR  ((volatile unsigned int *) 0x10140000)
 
