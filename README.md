@@ -1,9 +1,9 @@
-Build a multitask OS kernel for ARM from scratch
+Build a minimal multi-tasking OS kernel for ARM from scratch
 
 Prerequisites
 -------------
-- QEMU ARM system emulation
-- GNU Toolchain for ARM
+- [QEMU ARM system emulation](http://qemu.org/)
+- [GNU Toolchain for ARM](https://launchpad.net/gcc-arm-embedded)
 
 Steps
 -----
