@@ -15,7 +15,7 @@ keep_loading:
 	bl c_entry /* Jump to the c_entry function of our OS */
 
 interrupt_table:
-	ldr pc, swi_entry_address
+	ldr pc, svc_entry_address
 
-swi_entry_address: .word swi_entry
+svc_entry_address: .word svc_entry
 interrupt_table_end:
