@@ -1,27 +1,48 @@
 CROSS_COMPILE ?= arm-none-eabi-
+CC := $(CROSS_COMPILE)gcc
+CFLAGS = -fno-common -ffreestanding -O0 \
+	 -gdwarf-2 -g3 -Wall -Werror \
+	 -mcpu=cortex-m3 -mthumb \
+	 -Wl,-Thello.ld -nostartfiles \
 
-TARGET = hello.bin
-all: $(TARGET)
+ARCH = CM3
+VENDOR = ST
+PLAT = STM32F10x
 
-CFLAGS = -mcpu=arm926ej-s
-ASFLAGS = -mcpu=arm926ej-s
+LIBDIR = ..
+CMSIS_LIB=$(LIBDIR)/libraries/CMSIS/$(ARCH)
+STM32_LIB=$(LIBDIR)/libraries/STM32F10x_StdPeriph_Driver
 
-$(TARGET): hello.elf hello.o startup.o
-	$(CROSS_COMPILE)objcopy -O binary hello.elf hello.bin
+CMSIS_CORE_SRC = $(CMSIS_LIB)/CoreSupport
+CMSIS_PLAT_SRC = $(CMSIS_LIB)/DeviceSupport/$(VENDOR)/$(PLAT)
 
-hello.elf: hello.ld hello.o startup.o
-	$(CROSS_COMPILE)ld -T hello.ld hello.o startup.o -o hello.elf -N -Ttext=0x10000
+all: hello.bin
 
-hello.o: hello.c
-	$(CROSS_COMPILE)gcc $(CFLAGS) -c hello.c -o hello.o
+hello.bin: hello.c
+	$(CC) $(CFLAGS) \
+		-I . \
+		-I$(CMSIS_CORE_SRC) \
+		-I$(CMSIS_PLAT_SRC) \
+		-I$(STM32_LIB)/inc \
+		-o hello.elf \
+		\
+		$(CMSIS_CORE_SRC)/core_cm3.c \
+		$(CMSIS_PLAT_SRC)/system_stm32f10x.c \
+		$(CMSIS_PLAT_SRC)/startup/gcc_ride7/startup_stm32f10x_md.s \
+		$(STM32_LIB)/src/stm32f10x_rcc.c \
+		$(STM32_LIB)/src/stm32f10x_gpio.c \
+		$(STM32_LIB)/src/stm32f10x_usart.c \
+		$(STM32_LIB)/src/stm32f10x_exti.c \
+		$(STM32_LIB)/src/misc.c \
+		\
+		hello.c
+	$(CROSS_COMPILE)objcopy -Obinary hello.elf hello.bin
+	$(CROSS_COMPILE)objdump -S hello.elf > hello.list
 
-startup.o: startup.S
-	$(CROSS_COMPILE)as $(ASFLAGS) startup.S -o startup.o
-
-qemu: $(TARGET)
+qemu: hello.bin
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
-	qemu-system-arm -M versatilepb -cpu arm926 -m 128M -nographic -kernel $(TARGET)
+	qemu-system-arm -M stm32-p103 -nographic -kernel hello.bin
 
 clean:
-	rm -f *.o *.bin *.elf
+	rm -f *.o *.bin *.elf *.list
