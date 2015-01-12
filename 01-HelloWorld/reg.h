@@ -16,6 +16,10 @@
 #define RCC_BDCR	((__REG)(RCC + 0x20))
 #define RCC_CSR		((__REG)(RCC + 0x24))
 
+/* Flash Memory Map */
+#define FLASH		((uint32_t)0x40022000)
+#define FLASH_ACR	((__REG)(FLASH + 0x00))
+
 /* GPIO Memory Map */
 #define GPIOA		((uint32_t)0x40010800)
 #define GPIOA_CRL	((__REG)(GPIOA + 0x00))
