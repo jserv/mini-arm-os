@@ -16,6 +16,6 @@ void main(void)
 
 __attribute ((section(".isr_vector")))
 uint32_t *isr_vectors[] = {
-	(uint32_t *)	_estack,		// stack pointer
+	(uint32_t *)	&_estack,		// stack pointer
 	(uint32_t *)	main,			// code entry point
 };
