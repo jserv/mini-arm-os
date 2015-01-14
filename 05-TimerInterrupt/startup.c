@@ -68,45 +68,18 @@ void main(void)
 	c_entry();
 }
 
-void nmi_handler(void)
+void default_handler(void)
 {
 	while(1);
 }
 
-void hardfault_handler(void)
-{
-	while(1);
-}
-
-void memmanage_handler(void)
-{
-	while(1);
-}
-
-void busfault_handler(void)
-{
-	while(1);
-}
-
-void usagefault_handler(void)
-{
-	while(1);
-}
-
-void svc_handler(void)
-{
-	while(1);
-}
-
-void debugmon_handler(void)
-{
-	while(1);
-}
-
-void pendsv_handler(void)
-{
-	while(1);
-}
+void nmi_handler(void) __attribute((weak, alias ("default_handler")));
+void hardfault_handler(void) __attribute((weak, alias ("default_handler")));
+void memmanage_handler(void) __attribute((weak, alias ("default_handler")));
+void busfault_handler(void) __attribute((weak, alias ("default_handler")));
+void usagefault_handler(void) __attribute((weak, alias ("default_handler")));
+void svc_handler(void) __attribute((weak, alias ("default_handler")));
+void pendsv_handler(void) __attribute((weak, alias ("default_handler")));
 
 extern void systick_handler(void);
 
@@ -124,7 +97,7 @@ uint32_t *isr_vectors[] = {
 	0,
 	0,
 	(uint32_t *)	svc_handler,		// svc handler
-	(uint32_t *)	debugmon_handler,	// debug mon handler
+	0,
 	0,
 	(uint32_t *)	pendsv_handler,		// pendsv handler
 	(uint32_t *)	systick_handler		// systick handler
