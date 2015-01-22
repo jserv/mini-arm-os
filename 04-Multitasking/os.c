@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
-#include "reg.h"
+#include <stm32f10x_usart.h>
+#include <stm32f10x_rcc.h>
+#include <stm32f10x_gpio.h>
 #include "asm.h"
 
 /* Size of our user task stacks in words */
@@ -9,35 +11,52 @@
 /* Number of user task */
 #define TASK_LIMIT 2
 
-/* USART TXE Flag
- * This flag is cleared when data is written to USARTx_DR and
- * set when that data is transferred to the TDR
- */
-#define USART_FLAG_TXE ((uint16_t)0x0080)
-
 void usart_init(void)
 {
-	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
-	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
+	USART_InitTypeDef USART2_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
 
-	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
-	*(GPIOA_CRL) = 0x00004B00;
-	*(GPIOA_CRH) = 0x44444444;
-	*(GPIOA_ODR) = 0x00000000;
-	*(GPIOA_BSRR) = 0x00000000;
-	*(GPIOA_BRR) = 0x00000000;
+	// ENable clocks BEFORE using/configuring peripherals that expect them to be running
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 
-	*(USART2_CR1) = 0x0000000C;
-	*(USART2_CR2) = 0x00000000;
-	*(USART2_CR3) = 0x00000000;
-	*(USART2_CR1) |= 0x2000;
+	// Configure USART2 Tx (PA.2) as alternate function push-pull
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	// Configure USART2 Rx (PA.3) as input floating
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	// enable UART peripheral by activating clock
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+
+	// USART2 configuration
+	USART2_InitStructure.USART_BaudRate = 115200;
+	USART2_InitStructure.USART_WordLength = USART_WordLength_8b;  //Word Length = 8 Bits
+	USART2_InitStructure.USART_StopBits = USART_StopBits_1;  //Two Stop Bit
+	USART2_InitStructure.USART_Parity = USART_Parity_No ;   //No parity
+	USART2_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;  //Hardware flow control disabled (RTS and CTS signals)
+	USART2_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;  //Receive and transmit enabled
+
+	//Configure USARTs
+	USART_Init(USART2,&USART2_InitStructure);
+
+	//Enable USARTs
+	USART_Cmd(USART2, ENABLE);
 }
 
 void print_str(char *str)
 {
 	while(*str) {
-		while(!(*(USART2_SR) & USART_FLAG_TXE));
-		*(USART2_DR) = (*str & 0xFF);
+		while(!(USART2->SR & USART_FLAG_TXE));
+		USART2->DR = (*str & 0xFF);
 		str++;
 	}
 }
@@ -52,12 +71,11 @@ unsigned int *init_task(unsigned int *stack, void (*start)(void))
 
 void task1_func(void)
 {
-	print_str("task1: Executed!\n");
-	print_str("task1: Now, return to kernel mode\n");
-	syscall();
-	print_str("task1: About to enter kernel\n");
-	while (1)
+	while (1) {
+		print_str("task1: Executed!\n");
+		print_str("task1: Now, return to kernel mode\n");
 		syscall(); /* return to kernel mode */
+	}
 }
 
 void task2_func(void)
@@ -69,12 +87,11 @@ void task2_func(void)
 	}
 }
 
-int c_entry(void)
+int main(void)
 {
 	unsigned int user_stacks[TASK_LIMIT][STACK_SIZE];
 	unsigned int *usertasks[TASK_LIMIT];
 	size_t task_count = 0;
-	size_t current_task = 0;
 
 	usertasks[0] = init_task(user_stacks[0], &task1_func);
 	task_count += 1;
@@ -84,13 +101,16 @@ int c_entry(void)
 	usart_init();
 
 	print_str("OS: Starting...\n");
-	print_str("OS: Scheduler implementation : round-robin\n");
-	while (1) {
-		usertasks[current_task] = activate(usertasks[current_task]);
-		current_task++;
-		if (current_task >= task_count)
-			current_task = 0;
-	}
+	print_str("OS: First call task 1\n");
+	usertasks[0] = activate(usertasks[0]);
+	print_str("OS: Back to OS, call task 1\n");
+	usertasks[0] = activate(usertasks[0]);
+	print_str("OS: Back to OS, call task 2\n");
+	usertasks[1] = activate(usertasks[1]);
+	print_str("OS: Back to OS, call task 1\n");
+	usertasks[0] = activate(usertasks[0]);
+
+	while(1);
 
 	return 0;
 }
