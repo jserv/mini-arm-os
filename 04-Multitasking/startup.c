@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include "reg.h"
-#include "asm.h"
 
 /********************  Bit definition for RCC_CR register  ********************/
 #define RCC_CR_HSION	((uint32_t)0x00000001)		/*!< Internal High Speed clock enable */
@@ -48,20 +47,12 @@ void main(void)
 	uint32_t *idata_begin = &_sidata;
 	uint32_t *data_begin = &_sdata;
 	uint32_t *data_end = &_edata;
-	while(data_begin < data_end) {
-		*data_begin = *idata_begin;
-		data_begin++;
-		idata_begin++;
-	}
+	while(data_begin < data_end) *data_begin++ = *idata_begin++;
 
 	/* Zero fill the bss segment. */
 	uint32_t *bss_begin = &_sbss;
 	uint32_t *bss_end = &_ebss;
-
-	while(bss_begin < bss_end) {
-		*bss_begin = 0;
-		bss_begin++;
-	}
+	while(bss_begin < bss_end) *bss_begin++ = 0;
 
 	/* Clock system intitialization */
 	rcc_clock_init();
@@ -69,30 +60,17 @@ void main(void)
 	c_entry();
 }
 
-void nmi_handler(void)
+void default_handler(void)
 {
 	while(1);
 }
 
-void hardfault_handler(void)
-{
-	while(1);
-}
-
-void memmanage_handler(void)
-{
-	while(1);
-}
-
-void busfault_handler(void)
-{
-	while(1);
-}
-
-void usagefault_handler(void)
-{
-	while(1);
-}
+void nmi_handler(void) __attribute((weak, alias ("default_handler")));
+void hardfault_handler(void) __attribute((weak, alias ("default_handler")));
+void memmanage_handler(void) __attribute((weak, alias ("default_handler")));
+void busfault_handler(void) __attribute((weak, alias ("default_handler")));
+void usagefault_handler(void) __attribute((weak, alias ("default_handler")));
+void svc_handler(void) __attribute((weak, alias ("default_handler")));
 
 __attribute ((section(".isr_vector")))
 uint32_t *isr_vectors[] = {
@@ -107,7 +85,7 @@ uint32_t *isr_vectors[] = {
 	0,
 	0,
 	0,
-	(uint32_t *)	svc_handler		// svc handler
+	(uint32_t *)	svc_handler,		// svc handler
 };
 
 void rcc_clock_init(void)
