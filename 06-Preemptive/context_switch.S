@@ -1,17 +1,35 @@
-.equ USR_MODE, 0x10
-.equ SYS_MODE, 0x1F
-.equ SVC_MODE, 0x13
-.equ IRQ_MODE, 0x12
-.equ INT_OFF, 0xC0
+.syntax unified
+
+.type svc_handler, %function
+.global svc_handler
+.type systick_handler, %function
+.global systick_handler
+svc_handler:
+systick_handler:
+	/* save user state */
+	mrs r0, psp
+	stmdb r0!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+
+	/* load kernel state */
+	pop {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
+	msr psr_nzcvq, ip
+
+	bx lr
 
 .global activate
 activate:
-	stmfd sp!, {r1-r12, lr}
-	nop
-	msr CPSR_c, SYS_MODE /* Sys mode with IRQ enabled and FIQ disabled*/
-	mov sp, r0 /* MOVE TO THE STACK USER
-	/* Load task's context */
-	mov ip, r0
-	ldmfd sp!, {r0-ip,lr}
-	nop
-	mov pc, lr
+	/* save kernel state */
+	mrs ip, psr
+	push {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
+
+	/* switch to process stack */
+	msr psp, r0
+	mov r0, #3
+	msr control, r0
+	isb
+
+	/* load user state */
+	pop {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+
+	/* jump to user task */
+	bx lr

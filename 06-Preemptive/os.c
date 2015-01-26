@@ -1,30 +1,7 @@
-#include "asm.h"
-
-/* peripherals */
-#include "UART.h"
-#include "TIMER.h"
-#include "VIC.h"
-
-#include "task.h"
 #include <stddef.h>
-
-void print_uart0(const char *s)
-{
-	while (*s) {
-		while (UARTFR & UARTFR_TXFF);
-		UART0 = *s;
-		s++;
-	}
-}
-
-inline void delay(const int count)
-{
-	int c = count * 50000;
-	while (c--)
-		;
-}
-
-/* user task */
+#include <stdint.h>
+#include "reg.h"
+#include "asm.h"
 
 /* Size of our user task stacks in words */
 #define STACK_SIZE	256
@@ -32,165 +9,131 @@ inline void delay(const int count)
 /* Number of user task */
 #define TASK_LIMIT	3
 
+/* USART TXE Flag
+ * This flag is cleared when data is written to USARTx_DR and
+ * set when that data is transferred to the TDR
+ */
+#define USART_FLAG_TXE ((uint16_t)0x0080)
+
+void usart_init(void)
+{
+	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
+	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
+
+	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
+	*(GPIOA_CRL) = 0x00004B00;
+	*(GPIOA_CRH) = 0x44444444;
+	*(GPIOA_ODR) = 0x00000000;
+	*(GPIOA_BSRR) = 0x00000000;
+	*(GPIOA_BRR) = 0x00000000;
+
+	*(USART2_CR1) = 0x0000000C;
+	*(USART2_CR2) = 0x00000000;
+	*(USART2_CR3) = 0x00000000;
+	*(USART2_CR1) |= 0x2000;
+}
+
+void print_str(char *str)
+{
+	while(*str) {
+		while(!(*(USART2_SR) & USART_FLAG_TXE));
+		*(USART2_DR) = (*str & 0xFF);
+		str++;
+	}
+}
+
+void delay(int count)
+{
+	count *= 50000;
+	while(count--);
+}
+
+/* Exception return behavior */
+#define HANDLER_MSP	0xFFFFFFF1
+#define THREAD_MSP	0xFFFFFFF9
+#define THREAD_PSP	0xFFFFFFFD
+
+/* Initilize user task stack and execute it one time */
+/* XXX: Implementation of task creation is a little bit tricky. In fact,
+ * after the second time we called `activate()` which is returning from
+ * exception. But the first time we called `activate()` which is not returning
+ * from exception. Thus, we have to set different `lr` value.
+ * First time, we should set function address to `lr` directly. And after the
+ * second time, we should set `THREAD_PSP` to `lr` so that exception return
+ * works correctly.
+ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
+ */
+unsigned int *create_task(unsigned int *stack, void (*start)(void))
+{
+	static int first = 1;
+
+	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
+	if(first) {
+		stack[8] = (unsigned int)start;
+		first = 0;
+	}
+	else {
+		stack[8] = (unsigned int)THREAD_PSP;
+		stack[15] = (unsigned int)start;
+		stack[16] = (unsigned int)0x01000000; // PSR Thumb bit
+	}
+	stack = activate(stack);
+
+	return stack;
+}
+
 void task1_func(void)
 {
-	print_uart0("task1: Executed!\r\n");
+	print_str("task1: Created!\n");
+	print_str("task1: Now, return to kernel mode\n");
+	syscall();
 	while (1) {
-		delay(100);
-		print_uart0("task1: Running...\r\n");
+		print_str("task1: Running...\n");
+		delay(1000);
 	}
 }
 
 void task2_func(void)
 {
-	print_uart0("task2: Executed!\r\n");
+	print_str("task2: Created!\n");
+	print_str("task2: Now, return to kernel mode\n");
+	syscall();
 	while (1) {
-		delay(100);
-		print_uart0("task2: Running...\r\n");
+		print_str("task2: Running...\n");
+		delay(1000);
 	}
 }
 
-void task3_func(void)
+int c_entry(void)
 {
-	print_uart0("task3: Executed!\r\n");
-	syscall(3);	/* return to kernel mode */
-}
-
-static unsigned int task_count;
-static unsigned int currentTask;
-taskstruct task[TASK_LIMIT];
-
-void c_entry(void)
-{
-	int i = 0;
-	task_count = 0;
-	currentTask = 0;
-
-	/* VIC Configuration */
-	VIC_INT_SELECT = 0;
-	VIC_ENABLE_INT = 0x00000210;	/* Enable Timer01 Interrupt and UART0 */
-
 	unsigned int user_stacks[TASK_LIMIT][STACK_SIZE];
+	unsigned int *usertasks[TASK_LIMIT];
+	size_t task_count = 0;
+	size_t current_task;
 
-	/* Task initialization */
-	init_task(&task[0], user_stacks[0], &task1_func);
-	task_count = task_count + 1;
-	init_task(&task[1], user_stacks[1], &task2_func);
-	task_count = task_count + 1;
-	init_task(&task[2], user_stacks[2], &task3_func);
-	task_count = task_count + 1;
+	usart_init();
 
-	print_uart0("OS: Starting...\n");
-	print_uart0("OS: Scheduler implementation : round-robin\n");
+	print_str("OS: Starting...\n");
+	print_str("OS: First create task 1\n");
+	usertasks[0] = create_task(user_stacks[0], &task1_func);
+	task_count += 1;
+	print_str("OS: Back to OS, create task 2\n");
+	usertasks[1] = create_task(user_stacks[1], &task2_func);
+	task_count += 1;
 
-	/* Timer1 Configuration */
-	TIMER01_disable();
-	TIMER01_LOAD_VALUE = 65535;
-	TIMER01_enable();
+	print_str("\nOS: Start round-robin scheduler!\n");
+	/* SysTick configuration */
+	*SYSTICK_LOAD = 7200000;
+	*SYSTICK_VAL = 0;
+	*SYSTICK_CTRL = 0x07;
+	current_task = 0;
+	while(1) {
+		print_str("OS: Activate next task\n");
+		usertasks[current_task] = activate(usertasks[current_task]);
+		print_str("OS: Back to OS\n");
 
-	activate(task[currentTask].sp);
-
-	while (i < 5) {
-		TIMER01_disable();
-		print_uart0("Kernel gets back control ! \n");
-		print_uart0("Kernel can do some stuff...\n");
-		print_uart0("Load the next task ! \n");
-
-		/* Scheduler */
-		currentTask = currentTask + 1;
-		if (currentTask >= 2)
-			currentTask = 0; /* We only start the first and second task */
-
-		TIMER01_LOAD_VALUE = 65535;
-		TIMER01_enable();
-
-		activate(task[currentTask].sp);
-		TIMER01_disable();
-		i++;
+		current_task = current_task == (task_count - 1) ? 0 : current_task + 1;
 	}
 
-	print_uart0("Kernel is going to activate Task #3 "
-	            "which will call a syscall() to return back "
-	            "to kernel mode \n");
-	activate(task[2].sp);
-	print_uart0("Kernel gets back control ! \n");
-	print_uart0("Now, the OS is about to shutdown.");
-
-	while (1)
-		/* wait */ ;
-}
-
-void event_irq_handler(void)
-{
-	int src_IRQ = VIC_BASE_ADDR;
-
-	/* Disable all interrupts and clear all flags */
-	TIMER01_disable();
-	TIMER01_CLEAR_INT = 1;
-	VIC_CLEAR_INT = 0xFFFFFFFF;
-
-	print_uart0("\tInterrupt raised!\n");
-
-	switch (src_IRQ & 0x00000010) {
-	case 0x00000010:
-		print_uart0("Interrupt from Timer 1\t\n");
-		break;
-	case 0x00000800:
-		print_uart0("Interrupt from UART0\t\n");
-		break;
-	default :
-		print_uart0("Interrupt unknown\r\n");
-	}
-
-	VIC_ENABLE_INT = 0x00000010;	/* Enable Timer01 interrupt */
-}
-
-void event_svc_handler(int taskNumber)
-{
-	char printable[] = { taskNumber + '0', '\0' };
-	print_uart0("Task number that called the syscall : ");
-	print_uart0((char *) &printable);
-	print_uart0("\r\n");
-}
-
-void saveTaskContext(int *ptr)
-{
-	int i = 0;
-
-	/* update the stack task */
-	for (i = 0; i <= 13; i++)
-		task[currentTask].sp[i] = *(ptr + i);
-}
-
-/* all unimplemented handlers are infinite loops (for the moment) */
-void __attribute__((interrupt)) undef_handler(void)
-{
-	for (;;);
-}
-
-void __attribute__((interrupt)) prefetch_abort_handler(void)
-{
-	for (;;);
-}
-
-void __attribute__((interrupt)) data_abort_handler(void)
-{
-	for (;;);
-}
-
-void __attribute__((interrupt)) fiq_handler(void)
-{
-	for (;;);
-}
-
-/* Copy the vector table to the 0x00000000 adddress */
-void copy_vectors(void)
-{
-	extern unsigned int vectors_start;
-	extern unsigned int vectors_end;
-	unsigned int *vectors_src = &vectors_start;
-	unsigned int *vectors_dst = (unsigned int *) 0;
-
-	while (vectors_src < &vectors_end)
-		*vectors_dst++ = *vectors_src++;
+	return 0;
 }
