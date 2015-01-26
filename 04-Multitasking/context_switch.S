@@ -1,8 +1,8 @@
 .syntax unified
 
-	.type SVC_Handler, %function
-	.global SVC_Handler
-SVC_Handler:
+.type svc_handler, %function
+.global svc_handler
+svc_handler:
 	/* save user state */
 	mrs r0, psp
 	stmdb r0!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
