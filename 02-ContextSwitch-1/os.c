@@ -41,7 +41,7 @@ void usertask(void)
 	while(1); /* Never terminate the task */
 }
 
-int c_entry(void)
+int main(void)
 {
 	/* Initialization of process stack.
 	 * r4, r5, r6, r7, r8, r9, r10, r11, lr */

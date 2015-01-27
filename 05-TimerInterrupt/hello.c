@@ -34,7 +34,7 @@ void print_str(char *str)
 	}
 }
 
-void c_entry(void)
+void main(void)
 {
 	usart_init();
 

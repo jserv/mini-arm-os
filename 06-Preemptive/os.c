@@ -104,7 +104,7 @@ void task2_func(void)
 	}
 }
 
-int c_entry(void)
+int main(void)
 {
 	unsigned int user_stacks[TASK_LIMIT][STACK_SIZE];
 	unsigned int *usertasks[TASK_LIMIT];

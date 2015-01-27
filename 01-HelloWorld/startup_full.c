@@ -22,8 +22,8 @@
 
 #define HSE_STARTUP_TIMEOUT	((uint16_t)0x0500)	/*!< Time out for HSE start up */ 
 
-/* c code entry point */
-extern void c_entry(void);
+/* main program entry point */
+extern void main(void);
 
 /* start address for the initialization values of the .data section. 
 defined in linker script */
@@ -41,37 +41,29 @@ extern uint32_t _estack;
 
 void rcc_clock_init(void);
 
-void main(void)
+void reset_handler(void)
 {
 	/* Copy the data segment initializers from flash to SRAM */  
 	uint32_t *idata_begin = &_sidata;
 	uint32_t *data_begin = &_sdata;
 	uint32_t *data_end = &_edata;
-	while(data_begin < data_end) {
-		*data_begin = *idata_begin;
-		data_begin++;
-		idata_begin++;
-	}
+	while(data_begin < data_end) *data_begin++ = *idata_begin++;
 
 	/* Zero fill the bss segment. */  
 	uint32_t *bss_begin = &_sbss;
 	uint32_t *bss_end = &_ebss;
-
-	while(bss_begin < bss_end) {
-		*bss_begin = 0;
-		bss_begin++;
-	}
+	while(bss_begin < bss_end) *bss_begin++ = 0;
 
 	/* Clock system intitialization */
 	rcc_clock_init();
 
-	c_entry();
+	main();
 }
 
 __attribute ((section(".isr_vector")))
 uint32_t *isr_vectors[] = {
 	(uint32_t *)	&_estack,		// stack pointer
-	(uint32_t *)	main,			// code entry point
+	(uint32_t *)	reset_handler,		// code entry point
 	(uint32_t *)	nmi_handler,		// NMI handler
 	(uint32_t *)	hardfault_handler	// hard fault handler
 };

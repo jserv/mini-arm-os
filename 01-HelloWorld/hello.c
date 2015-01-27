@@ -16,7 +16,7 @@ void print_str(char *str)
 	}
 }
 
-void c_entry() {
+void main(void) {
 	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
 	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
 
