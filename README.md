@@ -2,13 +2,13 @@ Build a minimal multi-tasking OS kernel for ARM from scratch
 
 Prerequisites
 -------------
-- [QEMU ARM system emulation](http://qemu.org/)
+- [QEMU with an STM32 microcontroller implementation](http://beckus.github.io/qemu_stm32/)
 - [GNU Toolchain for ARM](https://launchpad.net/gcc-arm-embedded)
 
 Steps
 -----
 * `01-HelloWorld`
-  - Use ARM PrimeCell PL011 UART0 to print trivial greetings
+  - Enable STM32 USART to print trivial greetings
 * `02-ContextSwitch-1`
   - Basic switch between user and kernel mode
 * `03-ContextSwitch-2`
@@ -16,7 +16,7 @@ Steps
 * `04-Multitasking`
   - Two user tasks are interatively switching
 * `05-TimerInterrupt`
-  - Use ARM timer peripheral for future scheduler implementation
+  - Enable SysTick for future scheduler implementation
 * `06-Preemptive`
   - Basic preemptive scheduling
 
