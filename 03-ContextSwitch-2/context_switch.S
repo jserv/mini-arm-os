@@ -1,31 +1,32 @@
-.global svc_entry
-svc_entry:
-	/* Save user state */
-	msr CPSR_c, #0xDF /* System mode */
-	push {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, fp, ip, lr}
-	mov r0, sp
-	msr CPSR_c, #0xD3 /* Supervisor mode */
+.thumb
+.syntax unified
 
-	mrs ip, SPSR
-	stmfd r0!, {ip, lr}
+.type svc_handler, %function
+.global svc_handler
+svc_handler:
+	/* save user state */
+	mrs r0, psp
+	stmdb r0!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
 
-	/* Load kernel state */
-	pop {r4, r5, r6, r7, r8, r9, r10, fp, ip, lr}
-	mov sp, ip
+	/* load kernel state */
+	pop {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
+	msr psr, ip
+
 	bx lr
 
 .global activate
 activate:
-	/* Save kernel state */
-	mov ip, sp
-	push {r4, r5, r6, r7, r8, r9, r10, fp, ip, lr}
+	/* save kernel state */
+	mrs ip, psr
+	push {r4, r5, r6, r7, r8, r9, r10, r11, ip, lr}
 
-	ldmfd r0!, {ip, lr}
-	msr SPSR, ip
+	/* switch to process stack */
+	msr psp, r0
+	mov r0, #3
+	msr control, r0
 
-	msr CPSR_c, #0xDF /* System mode */
-	mov sp, r0
-	pop {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, fp, ip, lr}
-	msr CPSR_c, #0xD3 /* Supervisor mode */
+	/* load user state */
+	pop {r4, r5, r6, r7, r8, r9, r10, r11, lr}
 
-	movs pc, lr
+	/* jump to user task */
+	bx lr

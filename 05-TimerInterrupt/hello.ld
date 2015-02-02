@@ -1,17 +1,38 @@
-ENTRY(vectors_start)
+ENTRY(main)
+
+MEMORY
+{
+	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 128K
+	RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 40K
+}
 
 SECTIONS
 {
-    . = 0x10000;
-    .text : {
-        startup.o
-        *(.text .rodata)
-     }
-    .data : { *(.data) }
-    .bss : { *(.bss) }
-    . = ALIGN(8);
-    . = . + 0x1000; /* 4KB of stack memory */
-    stack_top = .;
-    . = . + 0x1000; /* 4KB of irq stack memory */
-    irq_stack_top = .;
+	.text :
+	{
+		KEEP(*(.isr_vector))
+		*(.text)
+		*(.text.*)
+		*(.rodata)
+		_sromdev = .;
+		_eromdev = .;
+		_sidata = .;
+	} >FLASH
+
+	.data : AT(_sidata)
+	{
+		_sdata = .;
+		*(.data)
+		*(.data*)
+		_edata = .;
+	} >RAM
+
+	.bss :
+	{
+		_sbss = .;
+		*(.bss)
+		_ebss = .;
+	} >RAM
+
+	_estack = ORIGIN(RAM) + LENGTH(RAM);
 }

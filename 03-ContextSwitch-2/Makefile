@@ -1,37 +1,22 @@
 CROSS_COMPILE ?= arm-none-eabi-
+CC := $(CROSS_COMPILE)gcc
+AS := $(CROSS_COMPILE)as
+CFLAGS = -fno-common -ffreestanding -O0 \
+	 -gdwarf-2 -g3 -Wall -Werror \
+	 -mcpu=cortex-m3 -mthumb \
+	 -Wl,-Tos.ld -nostartfiles \
 
-ASFLAGS = -mcpu=arm926ej-s
-CFLAGS = -mcpu=arm926ej-s -Wall
-LDFLAGS = -N -Ttext=0x10000
+all: os.bin
 
-TARGET = os.bin
-all: $(TARGET)
-
-$(TARGET): os.elf os.o startup.o context_switch.o
-	$(CROSS_COMPILE)objcopy -O binary os.elf os.bin
-
-os.elf: os.ld os.o startup.o context_switch.o syscall.o
-	$(CROSS_COMPILE)ld -N $(LDFLAGS) -T os.ld \
-		os.o startup.o context_switch.o syscall.o \
-		-o os.elf 
-
-os.o: os.c asm.h UART.h
-	$(CROSS_COMPILE)gcc $(CFLAGS) -c os.c -o os.o
-	
-startup.o: startup.S
-	$(CROSS_COMPILE)as $(ASFLAGS) startup.S -o startup.o
-	
-context_switch.o: context_switch.S
-	$(CROSS_COMPILE)as $(ASFLAGS) context_switch.S -o context_switch.o
-
-syscall.o: syscall.S
-	$(CROSS_COMPILE)as $(ASFLAGS) syscall.S -o syscall.o
+os.bin: os.c startup.c context_switch.S syscall.S
+	$(CC) $(CFLAGS) $^ -o os.elf
+	$(CROSS_COMPILE)objcopy -Obinary os.elf os.bin
+	$(CROSS_COMPILE)objdump -S os.elf > os.list
 
 qemu: $(TARGET)
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
-	qemu-system-arm -M versatilepb -m 128M \
-		-nographic -kernel $(TARGET) 2>/dev/null
+	qemu-system-arm -M stm32-p103 -nographic -kernel os.bin
 
 clean:
-	rm -f *.o *.elf *.bin
+	rm -f *.o *.elf *.bin *.list
