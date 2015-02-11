@@ -6,7 +6,7 @@
  * This flag is cleared when data is written to USARTx_DR and
  * set when that data is transferred to the TDR
  */
-#define USART_FLAG_TXE ((uint16_t)0x0080)
+#define USART_FLAG_TXE ((uint16_t) 0x0080)
 
 void usart_init(void)
 {
