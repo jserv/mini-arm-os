@@ -2,10 +2,10 @@
 #include "reg.h"
 
 /* Bit definition for RCC_CR register */
-#define RCC_CR_HSION	((uint32_t) 0x00000001)		/*!< Internal High Speed clock enable */
-#define RCC_CR_HSEON	((uint32_t) 0x00010000)		/*!< External High Speed clock enable */
-#define RCC_CR_HSERDY	((uint32_t) 0x00020000)		/*!< External High Speed clock ready flag */
-#define RCC_CR_CSSON	((uint32_t) 0x00080000)		/*!< Clock Security System enable */
+#define RCC_CR_HSION		((uint32_t) 0x00000001)	/*!< Internal High Speed clock enable */
+#define RCC_CR_HSEON		((uint32_t) 0x00010000)	/*!< External High Speed clock enable */
+#define RCC_CR_HSERDY		((uint32_t) 0x00020000)	/*!< External High Speed clock ready flag */
+#define RCC_CR_CSSON		((uint32_t) 0x00080000)	/*!< Clock Security System enable */
 
 /* Bit definition for RCC_CFGR register */
 #define  RCC_CFGR_SW		((uint32_t) 0x00000003)	/*!< SW[1:0] bits (System clock Switch) */
