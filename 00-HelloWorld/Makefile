@@ -1,6 +1,6 @@
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
-CFLAGS = -fno-common \
+CFLAGS = -fno-common -O0 \
 	 -mcpu=cortex-m3 -mthumb \
 	 -T hello.ld -nostartfiles \
 
