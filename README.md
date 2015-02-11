@@ -17,8 +17,10 @@ make
 
 Steps
 -----
-* `01-HelloWorld`
+* `00-HelloWorld`
   - Enable STM32 USART to print trivial greetings
+* `01-HelloWorld`
+  - Almost identical to the previous one but improved startup routines
 * `02-ContextSwitch-1`
   - Basic switch between user and kernel mode
 * `03-ContextSwitch-2`
