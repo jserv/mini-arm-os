@@ -1,9 +1,8 @@
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
-CFLAGS = -fno-common -ffreestanding -O0 \
-	 -gdwarf-2 -g3 -Wall -Werror \
+CFLAGS = -fno-common \
 	 -mcpu=cortex-m3 -mthumb \
-	 -Wl,-Thello.ld -nostartfiles \
+	 -T hello.ld -nostartfiles \
 
 all: hello.bin
 
