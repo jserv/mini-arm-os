@@ -1,10 +1,6 @@
 #include <stdint.h>
 #include "reg.h"
 
-/* USART TXE Flag
- * This flag is cleared when data is written to USARTx_DR and
- * set when that data is transferred to the TDR
- */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
 int puts(const char *str)
@@ -21,7 +17,7 @@ void main(void)
 	*(RCC_APB2ENR) |= (uint32_t) (0x00000001 | 0x00000004);
 	*(RCC_APB1ENR) |= (uint32_t) (0x00020000);
 
-	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
+	/* USART2 Configuration */
 	*(GPIOA_CRL) = 0x00004B00;
 	*(GPIOA_CRH) = 0x44444444;
 
