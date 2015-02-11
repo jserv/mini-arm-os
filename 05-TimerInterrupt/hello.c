@@ -5,12 +5,12 @@
  * This flag is cleared when data is written to USARTx_DR and
  * set when that data is transferred to the TDR
  */
-#define USART_FLAG_TXE ((uint16_t)0x0080)
+#define USART_FLAG_TXE ((uint16_t) 0x0080)
 
 void usart_init(void)
 {
-	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
-	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
+	*(RCC_APB2ENR) |= (uint32_t) (0x00000001 | 0x00000004);
+	*(RCC_APB1ENR) |= (uint32_t) (0x00020000);
 
 	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
 	*(GPIOA_CRL) = 0x00004B00;
@@ -27,8 +27,8 @@ void usart_init(void)
 
 void print_str(char *str)
 {
-	while(*str) {
-		while(!(*(USART2_SR) & USART_FLAG_TXE));
+	while (*str) {
+		while (!(*(USART2_SR) & USART_FLAG_TXE));
 		*(USART2_DR) = (*str & 0xFF);
 		str++;
 	}
@@ -45,7 +45,7 @@ void main(void)
 	*SYSTICK_VAL = 0;
 	*SYSTICK_CTRL = 0x07;
 
-	while(1); /* wait */
+	while (1); /* wait */
 }
 
 void __attribute__((interrupt)) systick_handler(void)
