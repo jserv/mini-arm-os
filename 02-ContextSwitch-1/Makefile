@@ -6,9 +6,10 @@ CFLAGS = -fno-common -ffreestanding -O0 \
 	 -mcpu=cortex-m3 -mthumb \
 	 -Wl,-Tos.ld -nostartfiles \
 
-all: os.bin
+TARGET = os.bin
+all: $(TARGET)
 
-os.bin: os.c startup.c context_switch.S
+$(TARGET): os.c startup.c context_switch.S
 	$(CC) $(CFLAGS) $^ -o os.elf
 	$(CROSS_COMPILE)objcopy -Obinary os.elf os.bin
 	$(CROSS_COMPILE)objdump -S os.elf > os.list
