@@ -1,0 +1,24 @@
+The source code of mini-arm-os follows Linux style formatting/indenting.
+You can use `astyle' to indent the source files:
+
+    astyle --style=linux --indent=tab -p -U -K -H --suffix=none
+
+Brackets are broken from namespace, class, and function definitions.
+Brackets are attached to statements within a function.  Minimum conditional
+indent is one-half indent. It frequently is used with an indent of 8 spaces.
+
+Use tabs for indentation, and spaces for continuation line alignment. This
+ensures that the code is displayed correctly regardless of the viewer’s tab
+size.
+
+Insert space padding around operators. Any end of line comments will remain in
+the original column, if possible.
+
+Remove extra space padding around parenthesis on the inside and outside. Any
+end of line comments will remain in the original column, if possible.
+
+Indent 'case  X:' blocks from the 'case  X:' headers. Case statements not
+enclosed in blocks are NOT indented.
+
+Insert space padding after paren headers only (e.g. 'if', 'for', 'while'...).
+Any end of line comments will remain in the original column, if possible.
