@@ -10,8 +10,8 @@
 
 void usart_init(void)
 {
-	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
-	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
+	*(RCC_APB2ENR) |= (uint32_t) (0x00000001 | 0x00000004);
+	*(RCC_APB1ENR) |= (uint32_t) (0x00020000);
 
 	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
 	*(GPIOA_CRL) = 0x00004B00;
@@ -28,8 +28,8 @@ void usart_init(void)
 
 void print_str(char *str)
 {
-	while(*str) {
-		while(!(*(USART2_SR) & USART_FLAG_TXE));
+	while (*str) {
+		while (!(*(USART2_SR) & USART_FLAG_TXE));
 		*(USART2_DR) = (*str & 0xFF);
 		str++;
 	}
@@ -38,7 +38,7 @@ void print_str(char *str)
 void usertask(void)
 {
 	print_str("User Task #1\n");
-	while(1); /* Never terminate the task */
+	while (1); /* Never terminate the task */
 }
 
 int main(void)
@@ -54,7 +54,7 @@ int main(void)
 	print_str("OS Starting...\n");
 	activate(usertask_stack_start);
 
-	while(1); /* We can't exit, there is nowhere to go */
+	while (1); /* We can't exit, there is nowhere to go */
 
 	return 0;
 }
