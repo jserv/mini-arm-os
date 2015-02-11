@@ -13,12 +13,12 @@
  * This flag is cleared when data is written to USARTx_DR and
  * set when that data is transferred to the TDR
  */
-#define USART_FLAG_TXE ((uint16_t)0x0080)
+#define USART_FLAG_TXE ((uint16_t) 0x0080)
 
 void usart_init(void)
 {
-	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
-	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
+	*(RCC_APB2ENR) |= (uint32_t) (0x00000001 | 0x00000004);
+	*(RCC_APB1ENR) |= (uint32_t) (0x00020000);
 
 	/* USART2 Configuration, Rx->PA3, Tx->PA2 */
 	*(GPIOA_CRL) = 0x00004B00;
@@ -35,8 +35,8 @@ void usart_init(void)
 
 void print_str(char *str)
 {
-	while(*str) {
-		while(!(*(USART2_SR) & USART_FLAG_TXE));
+	while (*str) {
+		while (!(*(USART2_SR) & USART_FLAG_TXE));
 		*(USART2_DR) = (*str & 0xFF);
 		str++;
 	}
@@ -45,7 +45,7 @@ void print_str(char *str)
 void delay(int count)
 {
 	count *= 50000;
-	while(count--);
+	while (count--);
 }
 
 /* Exception return behavior */
@@ -68,14 +68,13 @@ unsigned int *create_task(unsigned int *stack, void (*start)(void))
 	static int first = 1;
 
 	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
-	if(first) {
-		stack[8] = (unsigned int)start;
+	if (first) {
+		stack[8] = (unsigned int) start;
 		first = 0;
-	}
-	else {
-		stack[8] = (unsigned int)THREAD_PSP;
-		stack[15] = (unsigned int)start;
-		stack[16] = (unsigned int)0x01000000; // PSR Thumb bit
+	} else {
+		stack[8] = (unsigned int) THREAD_PSP;
+		stack[15] = (unsigned int) start;
+		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 	}
 	stack = activate(stack);
 
@@ -122,12 +121,14 @@ int main(void)
 	task_count += 1;
 
 	print_str("\nOS: Start round-robin scheduler!\n");
+
 	/* SysTick configuration */
 	*SYSTICK_LOAD = 7200000;
 	*SYSTICK_VAL = 0;
 	*SYSTICK_CTRL = 0x07;
 	current_task = 0;
-	while(1) {
+
+	while (1) {
 		print_str("OS: Activate next task\n");
 		usertasks[current_task] = activate(usertasks[current_task]);
 		print_str("OS: Back to OS\n");
