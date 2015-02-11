@@ -3,7 +3,17 @@ Build a minimal multi-tasking OS kernel for ARM from scratch
 Prerequisites
 -------------
 - [QEMU with an STM32 microcontroller implementation](http://beckus.github.io/qemu_stm32/)
+  - Build instructions
+```
+./configure --disable-werror --enable-debug \
+    --target-list="arm-softmmu" \
+    --extra-cflags=-DSTM32_UART_NO_BAUD_DELAY \
+    --extra-cflags=-DSTM32_UART_ENABLE_OVERRUN \
+    --disable-gtk
+make
+```
 - [GNU Toolchain for ARM](https://launchpad.net/gcc-arm-embedded)
+- Set `$PATH` accordingly
 
 Steps
 -----
@@ -22,8 +32,11 @@ Steps
 
 Building and Verification
 -------------------------
-$ make
-$ make qemu
+* Changes the current working directory to the specified one and then
+```
+make
+make qemu
+```
 
 Reference
 ---------
