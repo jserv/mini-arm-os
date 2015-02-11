@@ -118,6 +118,7 @@ int main(void)
 
 	print_str("\nOS: Start multitasking, back to OS till task yield!\n");
 	current_task = 0;
+
 	while (1) {
 		print_str("OS: Activate next task\n");
 		usertasks[current_task] = activate(usertasks[current_task]);
