@@ -1,10 +1,11 @@
 #ifndef __REG_H_
 #define __REG_H_
 
-#define __REG		volatile uint32_t *
+#define __REG_TYPE	volatile uint32_t
+#define __REG		__REG_TYPE *
 
 /* RCC Memory Map */
-#define RCC		((__REG) 0x40021000)
+#define RCC		((__REG_TYPE) 0x40021000)
 #define RCC_CR		((__REG) (RCC + 0x00))
 #define RCC_CFGR	((__REG) (RCC + 0x04))
 #define RCC_CIR		((__REG) (RCC + 0x08))
@@ -17,11 +18,11 @@
 #define RCC_CSR		((__REG) (RCC + 0x24))
 
 /* Flash Memory Map */
-#define FLASH		((__REG) 0x40022000)
+#define FLASH		((__REG_TYPE) 0x40022000)
 #define FLASH_ACR	((__REG) (FLASH + 0x00))
 
 /* GPIO Memory Map */
-#define GPIOA		((__REG) 0x40010800)
+#define GPIOA		((__REG_TYPE) 0x40010800)
 #define GPIOA_CRL	((__REG) (GPIOA + 0x00))
 #define GPIOA_CRH	((__REG) (GPIOA + 0x04))
 #define GPIOA_IDR	((__REG) (GPIOA + 0x08))
@@ -31,7 +32,7 @@
 #define GPIOA_LCKR	((__REG) (GPIOA + 0x18))
 
 /* USART2 Memory Map */
-#define USART2		((__REG) 0x40004400)
+#define USART2		((__REG_TYPE) 0x40004400)
 #define USART2_SR	((__REG) (USART2 + 0x00))
 #define USART2_DR	((__REG) (USART2 + 0x04))
 #define USART2_BRR	((__REG) (USART2 + 0x08))
@@ -41,7 +42,7 @@
 #define USART2_GTPR	((__REG) (USART2 + 0x18))
 
 /* SysTick Memory Map */
-#define SYSTICK		((__REG) 0xE000E010)
+#define SYSTICK		((__REG_TYPE) 0xE000E010)
 #define SYSTICK_CTRL	((__REG) (SYSTICK + 0x00))
 #define SYSTICK_LOAD	((__REG) (SYSTICK + 0x04))
 #define SYSTICK_VAL	((__REG) (SYSTICK + 0x08))
