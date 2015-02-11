@@ -9,7 +9,7 @@
 
 /* Bit definition for RCC_CFGR register */
 #define RCC_CFGR_SW		((uint32_t) 0x00000003)	/*!< SW[1:0] bits (System clock Switch) */
-#define RCC_CFGR_SW_HSE	((uint32_t) 0x00000001)		/*!< HSE selected as system clock */
+#define RCC_CFGR_SW_HSE		((uint32_t) 0x00000001)	/*!< HSE selected as system clock */
 #define RCC_CFGR_SWS		((uint32_t) 0x0000000C)	/*!< SWS[1:0] bits (System Clock Switch Status) */
 #define RCC_CFGR_HPRE_DIV1	((uint32_t) 0x00000000)	/*!< SYSCLK not divided */
 #define RCC_CFGR_PPRE1_DIV1	((uint32_t) 0x00000000)	/*!< HCLK not divided */
