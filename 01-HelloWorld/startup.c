@@ -14,8 +14,8 @@ void reset_handler(void)
 	main();
 }
 
-__attribute ((section(".isr_vector")))
+__attribute((section(".isr_vector")))
 uint32_t *isr_vectors[] = {
-	(uint32_t *)	&_estack,		// stack pointer
-	(uint32_t *)	reset_handler,		// code entry point
+	(uint32_t *) &_estack,		/* stack pointer */
+	(uint32_t *) reset_handler,	/* code entry point */
 };

@@ -9,14 +9,15 @@
 
 void print_str(char *str)
 {
-	while(*str) {
-		while(!(*(USART2_SR) & USART_FLAG_TXE));
+	while (*str) {
+		while (!(*(USART2_SR) & USART_FLAG_TXE));
 		*(USART2_DR) = (*str & 0xFF);
 		str++;
 	}
 }
 
-void main(void) {
+void main(void)
+{
 	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
 	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
 
@@ -31,8 +32,8 @@ void main(void) {
 	*(USART2_CR2) = 0x00000000;
 	*(USART2_CR3) = 0x00000000;
 	*(USART2_CR1) |= 0x2000;
-	
+
 	print_str("Hello World!\n");
 
-	while(1);
+	while (1);
 }
