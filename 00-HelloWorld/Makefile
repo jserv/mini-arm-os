@@ -12,6 +12,7 @@ hello.bin: hello.c startup.c
 	$(CROSS_COMPILE)objdump -S hello.elf > hello.list
 
 qemu: hello.bin
+	@qemu-system-arm -M ? | grep stm32-p103 >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
 	qemu-system-arm -M stm32-p103 -nographic -kernel hello.bin
