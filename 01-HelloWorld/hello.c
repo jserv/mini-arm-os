@@ -5,9 +5,9 @@
  * This flag is cleared when data is written to USARTx_DR and
  * set when that data is transferred to the TDR
  */
-#define USART_FLAG_TXE ((uint16_t)0x0080)
+#define USART_FLAG_TXE	((uint16_t) 0x0080)
 
-void print_str(char *str)
+void print_str(const char *str)
 {
 	while (*str) {
 		while (!(*(USART2_SR) & USART_FLAG_TXE));
