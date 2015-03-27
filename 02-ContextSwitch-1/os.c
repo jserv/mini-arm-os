@@ -46,7 +46,8 @@ int main(void)
 	/* Initialization of process stack.
 	 * r4, r5, r6, r7, r8, r9, r10, r11, lr */
 	unsigned int usertask_stack[256];
-	unsigned int *usertask_stack_start = usertask_stack + 256 - 16;
+  //unsigned int *usertask_stack_start = usertask_stack + 256 - 16;
+  unsigned int *usertask_stack_start = usertask_stack + 256 - 9;
 	usertask_stack_start[8] = (unsigned int) &usertask;
 
 	usart_init();
