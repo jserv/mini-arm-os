@@ -26,6 +26,11 @@ qemu: $(TARGET) $(QEMU_STM32)
 	    -monitor stdio \
 	    -kernel  $(TARGET) \
 
+qemudbg: $(TARGET) $(QEMU_STM32)
+	$(QEMU_STM32) -M stm32-p103 \
+	    -monitor stdio \
+			-gdb tcp::3333 -S \
+	    -kernel  $(TARGET) \
 
 clean:
 	rm -f *.o *.elf *.bin *.list
