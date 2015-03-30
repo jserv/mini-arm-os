@@ -1,3 +1,5 @@
+export SHELL := /bin/bash
+
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
 AS := $(CROSS_COMPILE)as
