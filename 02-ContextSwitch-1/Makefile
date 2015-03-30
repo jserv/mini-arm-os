@@ -7,6 +7,7 @@ CFLAGS = -fno-common -ffreestanding -O0 \
 	 -gdwarf-2 -g3 -Wall -Werror \
 	 -mcpu=cortex-m3 -mthumb \
 	 -Wl,-Tos.ld -nostartfiles \
+	 -g \
 
 TARGET = os.bin
 all: $(TARGET)
