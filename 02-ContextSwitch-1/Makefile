@@ -11,6 +11,7 @@ CFLAGS = -fno-common -ffreestanding -O0 \
 	 -gdwarf-2 -g3 -Wall -Werror \
 	 -mcpu=cortex-m3 -mthumb \
 	 -Wl,-Tos.ld -nostartfiles \
+	 -g \
 
 TARGET = os.bin
 all: $(TARGET)
@@ -25,6 +26,11 @@ qemu: $(TARGET) $(QEMU_STM32)
 	    -monitor stdio \
 	    -kernel  $(TARGET) \
 
+qemudbg: $(TARGET) $(QEMU_STM32)
+	$(QEMU_STM32) -M stm32-p103 \
+	    -monitor stdio \
+			-gdb tcp::3333 -S \
+	    -kernel  $(TARGET) \
 
 clean:
 	rm -f *.o *.elf *.bin *.list
