@@ -1,4 +1,4 @@
-ENTRY(main)
+ENTRY(reset_handler)
 
 MEMORY
 {
