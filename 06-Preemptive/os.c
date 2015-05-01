@@ -42,7 +42,7 @@ void print_str(const char *str)
 	}
 }
 
-void delay(int count)
+void delay(volatile int count)
 {
 	count *= 50000;
 	while (count--);
