@@ -17,9 +17,9 @@ static tcb_t tasks[MAX_TASKS];
 static int lastTask;
 static int first = 1;
 
-/* XXX: Without naked attribute, GCC will corrupt r7 which is used for stack
+/* FIXME: Without naked attribute, GCC will corrupt r7 which is used for stack
  * pointer. If so, after restoring the tasks' context, we will get wrong stack
- * pointer. Maybe here is a better solution instead of naked attribute?
+ * pointer.
  */
 void __attribute__((naked)) pendsv_handler()
 {
@@ -103,7 +103,7 @@ int thread_create(void (*run)(void *), void *userdata)
 		stack[16] = (unsigned int) 0x21000000; /* PSR Thumb bit */
 	}
 
-	// Create the control block
+	/* Construct the control block */
 	tasks[threadId].stack = stack;
 	tasks[threadId].in_use = 1;
 
