@@ -15,6 +15,12 @@
  */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
+/* 72MHz */
+#define CPU_CLOCK_HZ 72000000
+
+/* 100 ms per tick. */
+#define TICK_RATE_HZ 10
+
 void usart_init(void)
 {
 	*(RCC_APB2ENR) |= (uint32_t) (0x00000001 | 0x00000004);
@@ -123,7 +129,7 @@ int main(void)
 	print_str("\nOS: Start round-robin scheduler!\n");
 
 	/* SysTick configuration */
-	*SYSTICK_LOAD = 7200000;
+	*SYSTICK_LOAD = (CPU_CLOCK_HZ / TICK_RATE_HZ) - 1UL;
 	*SYSTICK_VAL = 0;
 	*SYSTICK_CTRL = 0x07;
 	current_task = 0;
