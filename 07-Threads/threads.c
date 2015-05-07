@@ -27,7 +27,7 @@ void __attribute__((naked)) pendsv_handler()
 	asm volatile("mrs   r0, psp\n"
 	             "stmdb r0!, {r4-r11, lr}\n"
 	             "mov   %0, r0\n"
-	             : "=r"(tasks[lastTask].stack));
+	             : "=r" (tasks[lastTask].stack));
 
 	/* Find a new task to run */
 	while (1) {
@@ -40,7 +40,7 @@ void __attribute__((naked)) pendsv_handler()
 			             "ldmia r0!, {r4-r11, lr}\n"
 			             "msr psp, r0\n"
 			             "bx lr\n"
-			             : : "r"(tasks[lastTask].stack));
+			             : : "r" (tasks[lastTask].stack));
 		}
 	}
 }
@@ -67,7 +67,7 @@ void thread_start()
 	             "pop {r4-r11, lr}\n"
 	             "pop {r0}\n"
 	             "bx lr\n"
-	             : : "r"(tasks[lastTask].stack));
+	             : : "r" (tasks[lastTask].stack));
 }
 
 int thread_create(void (*run)(void *), void *userdata)

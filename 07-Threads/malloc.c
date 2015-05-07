@@ -26,10 +26,9 @@ static void *sbrk(unsigned int nbytes)
 	    && program_break + nbytes < heaps + MAX_HEAPS) {
 		unsigned char *previous_pb = program_break;
 		program_break += nbytes;
-		return (void *)previous_pb;
-	} else {
-		return (void *) - 1;
+		return (void *) previous_pb;
 	}
+	return (void *) - 1;
 }
 
 void *malloc(unsigned int nbytes)
@@ -60,12 +59,12 @@ void *malloc(unsigned int nbytes)
 
 		if (p == freep) {
 			cp = sbrk(nunits * sizeof(Header));
-			if (cp == (void *) - 1) {
+			if (cp == (void *) -1) {
 				return NULL;
 			} else {
-				p = (Header *)cp;
+				p = (Header *) cp;
 				p->s.size = nunits;
-				free((void *)(p + 1));
+				free((void *) (p + 1));
 				p = freep;
 			}
 		}
@@ -75,7 +74,7 @@ void *malloc(unsigned int nbytes)
 void free(void *ap)
 {
 	Header *bp, *p;
-	bp = (Header *)ap - 1;
+	bp = (Header *) ap - 1;
 
 	for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
 		if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
