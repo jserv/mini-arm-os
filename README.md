@@ -31,6 +31,8 @@ Steps
   - Enable SysTick for future scheduler implementation
 * `06-Preemptive`
   - Basic preemptive scheduling
+* `07-Threads`
+  - Implement user-level threads
 
 Building and Verification
 -------------------------
