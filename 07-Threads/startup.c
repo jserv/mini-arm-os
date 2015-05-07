@@ -76,22 +76,16 @@ void systick_handler(void) __attribute((weak, alias("default_handler")));
 
 __attribute((section(".isr_vector")))
 uint32_t *isr_vectors[] = {
-	(uint32_t *) &_estack,			/* stack pointer */
-	(uint32_t *) reset_handler,		/* code entry point */
-	(uint32_t *) nmi_handler,		/* NMI handler */
-	(uint32_t *) hardfault_handler,		/* hard fault handler */
-	(uint32_t *) memmanage_handler,		/* mem manage handler */
-	(uint32_t *) busfault_handler,		/* bus fault handler */
-	(uint32_t *) usagefault_handler,	/* usage fault handler */
-	0,
-	0,
-	0,
-	0,
-	(uint32_t *) svc_handler,		/* svc handler */
-	0,
-	0,
-	(uint32_t *) pendsv_handler,		/* pendsv handler */
-	(uint32_t *) systick_handler		/* systick handler */
+	[0x00] = (uint32_t *) &_estack,			/* stack pointer */
+	[0x01] = (uint32_t *) reset_handler,		/* code entry point */
+	[0x02] = (uint32_t *) nmi_handler,		/* NMI handler */
+	[0x03] = (uint32_t *) hardfault_handler,	/* hard fault handler */
+	[0x04] = (uint32_t *) memmanage_handler,	/* mem manage handler */
+	[0x05] = (uint32_t *) busfault_handler,		/* bus fault handler */
+	[0x06] = (uint32_t *) usagefault_handler,	/* usage fault handler */
+	[0x0B] = (uint32_t *) svc_handler,		/* svc handler */
+	[0x0E] = (uint32_t *) pendsv_handler,		/* pendsv handler */
+	[0x0F] = (uint32_t *) systick_handler		/* systick handler */
 };
 
 void rcc_clock_init(void)

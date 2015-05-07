@@ -1,7 +1,7 @@
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
 AS := $(CROSS_COMPILE)as
-CFLAGS = -fno-common -ffreestanding -O0 \
+CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 -gdwarf-2 -g3 -Wall -Werror \
 	 -mcpu=cortex-m3 -mthumb \
 	 -Wl,-Tos.ld -nostartfiles \
