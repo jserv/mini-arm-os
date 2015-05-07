@@ -61,6 +61,11 @@ void test2(void *userdata)
 	busy_loop(userdata);
 }
 
+void test3(void *userdata)
+{
+	busy_loop(userdata);
+}
+
 /* 72MHz */
 #define CPU_CLOCK_HZ 72000000
 
@@ -69,8 +74,7 @@ void test2(void *userdata)
 
 int main(void)
 {
-	const char *str1 = "Task1";
-	const char *str2 = "Task2";
+	const char *str1 = "Task1", *str2 = "Task2", *str3 = "Task3";
 
 	usart_init();
 
@@ -79,6 +83,9 @@ int main(void)
 
 	if (thread_create(test2, (void *) str2) == -1)
 		print_str("Thread 2 creation failed\r\n");
+
+	if (thread_create(test3, (void *) str3) == -1)
+		print_str("Thread 3 creation failed\r\n");
 
 	/* SysTick configuration */
 	*SYSTICK_LOAD = (CPU_CLOCK_HZ / TICK_RATE_HZ) - 1UL;
