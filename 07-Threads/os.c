@@ -61,6 +61,12 @@ void test2(void *userdata)
 	busy_loop(userdata);
 }
 
+/* 72MHz */
+#define CPU_CLOCK_HZ 72000000
+
+/* 100 ms per tick. */
+#define TICK_RATE_HZ 10
+
 int main(void)
 {
 	const char *str1 = "Task1";
@@ -75,7 +81,7 @@ int main(void)
 		print_str("Thread 2 creation failed\r\n");
 
 	/* SysTick configuration */
-	*SYSTICK_LOAD = 7200000;
+	*SYSTICK_LOAD = (CPU_CLOCK_HZ / TICK_RATE_HZ) - 1UL;
 	*SYSTICK_VAL = 0;
 	*SYSTICK_CTRL = 0x07;
 
