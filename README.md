@@ -17,6 +17,8 @@ make
 
 Steps
 -----
+* `00-Semihosting`
+  - Minimal semihosted ARM Cortex-M "Hello World"
 * `00-HelloWorld`
   - Enable STM32 USART to print trivial greetings
 * `01-HelloWorld`
