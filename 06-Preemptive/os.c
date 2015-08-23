@@ -60,31 +60,34 @@ void delay(volatile int count)
 #define THREAD_PSP	0xFFFFFFFD
 
 /* Initilize user task stack and execute it one time */
-/* XXX: Implementation of task creation is a little bit tricky. In fact,
- * after the second time we called `activate()` which is returning from
- * exception. But the first time we called `activate()` which is not returning
- * from exception. Thus, we have to set different `lr` value.
- * First time, we should set function address to `lr` directly. And after the
- * second time, we should set `THREAD_PSP` to `lr` so that exception return
- * works correctly.
+/* XXX: Implementation of task creation is a little bit tricky.
+ * We called `activate()` which is returning from exception.
+ * At initial stage, we run `initial_task()` to change the
+ * kernel mode into user mode, then change to exception mode.
+ * Thus, we can use the same way to initial the task. No need
+ * to specially handle the first task. After initial the mode
+ * enviroment. We should set `THREAD_PSP` to `lr` so that
+ * exception return works correctly.
  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
  */
 unsigned int *create_task(unsigned int *stack, void (*start)(void))
 {
-	static int first = 1;
-
 	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
-	if (first) {
-		stack[8] = (unsigned int) start;
-		first = 0;
-	} else {
-		stack[8] = (unsigned int) THREAD_PSP;
-		stack[15] = (unsigned int) start;
-		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
-	}
+	stack[8] = (unsigned int) THREAD_PSP;
+	stack[15] = (unsigned int) start;
+	stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 	stack = activate(stack);
 
 	return stack;
+}
+
+/* Initial the tasks enviroment.
+ * Change the kernel mode into exception mode
+ */
+void initialize_task(void)
+{
+	unsigned int null_stacks[32];
+	init_activate_env(&null_stacks[32]);
 }
 
 void task1_func(void)
@@ -117,6 +120,8 @@ int main(void)
 	size_t current_task;
 
 	usart_init();
+
+	initialize_task();
 
 	print_str("OS: Starting...\n");
 	print_str("OS: First create task 1\n");
