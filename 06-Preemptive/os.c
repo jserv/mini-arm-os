@@ -60,13 +60,14 @@ void delay(volatile int count)
 #define THREAD_PSP	0xFFFFFFFD
 
 /* Initilize user task stack and execute it one time */
+
 /* XXX: Implementation of task creation is a little bit tricky.
  * We called `activate()` which is returning from exception.
- * At initial stage, we run `initial_task()` to change the
- * kernel mode into user mode, then change to exception mode.
- * Thus, we can use the same way to initial the task. No need
- * to specially handle the first task. After initial the mode
- * enviroment. We should set `THREAD_PSP` to `lr` so that
+ * At initial stage, we call `task_init()` to change from the
+ * kernel mode into user mode, then switch to exception mode.
+ * Thus, we can use the same way to initial the task. Don't have
+ * to specially handle the first task. After initializing the
+ * enviroment, we should set `THREAD_PSP` to `lr` to ensure that
  * exception return works correctly.
  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
  */
@@ -81,10 +82,7 @@ unsigned int *create_task(unsigned int *stack, void (*start)(void))
 	return stack;
 }
 
-/* Initial the tasks enviroment.
- * Change the kernel mode into exception mode
- */
-void initialize_task(void)
+void task_init(void)
 {
 	unsigned int null_stacks[32];
 	init_activate_env(&null_stacks[32]);
@@ -121,7 +119,7 @@ int main(void)
 
 	usart_init();
 
-	initialize_task();
+	task_init();
 
 	print_str("OS: Starting...\n");
 	print_str("OS: First create task 1\n");
