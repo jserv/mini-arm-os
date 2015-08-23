@@ -84,7 +84,7 @@ unsigned int *create_task(unsigned int *stack, void (*start)(void))
 /* Initial the tasks enviroment.
  * Change the kernel mode into exception mode
  */
-void initial_task(void)
+void initialize_task(void)
 {
 	unsigned int null_stacks[32];
 	init_activate_env(&null_stacks[32]);
@@ -121,7 +121,7 @@ int main(void)
 
 	usart_init();
 
-	initial_task();
+	initialize_task();
 
 	print_str("OS: Starting...\n");
 	print_str("OS: First create task 1\n");
