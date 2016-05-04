@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef __REG_H_
 #define __REG_H_
 
