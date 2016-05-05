@@ -239,8 +239,8 @@ static void enableUART(void)
     /*
      * Flow Control don't need
      */
-    _uart->CR3 &= ~USART_CR3_RTSE; /* disable RTS flow control */
-    _uart->CR3 &= ~USART_CR3_CTSE; /* disable CTS flow control */
+    USART1->CR3 &= ~USART_CR3_RTSE; /* disable RTS flow control */
+    USART1->CR3 &= ~USART_CR3_CTSE; /* disable CTS flow control */
 
 
     /*******************************___BRR___********************************/
