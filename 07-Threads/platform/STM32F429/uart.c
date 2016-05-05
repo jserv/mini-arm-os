@@ -144,6 +144,13 @@ static void enableUartPeripheralCLOCK(void)
 }
 
 
+
+#define GPIO_PUPDR_M(n)                 (uint32_t) (0x3 << (2*n))          /* Pin mask */
+#define GPIO_PUPDR_PIN(n)               (uint32_t) (2*n)                   /* Pin bitshift */
+#define GPIO_PUPDR_NONE                 (uint32_t) (0x0)                   /* Port no pull-up, pull-down */ 
+#define GPIO_MODER_M(n)                 (uint32_t) (0x3 << 2*n)            /* Pin mask */
+#define GPIO_MODER_PIN(n)               (uint32_t) (2*n)                   /* Pin bitshift */
+#define GPIO_MODER_ALT                  (uint32_t) (0x2)                   /* Alternative function mode */
 /* 
  * All GPIO(contains USARTs) on AHB1 
  */
@@ -270,8 +277,9 @@ void usart_init(void)
 void print_str(const char *str)
 {
     while (*str) {
-        while (!(*(USART1->SR) & USART_SR_TXE));
-        *(USART1->DR) = (*str & 0x1FF);
+        while (!(USART1->SR & USART_SR_TXE))
+            ;
+        USART1->DR = (*str & 0x1FF);
         str++;
     }
 }
