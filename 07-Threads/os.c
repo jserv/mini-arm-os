@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "reg.h"
+#include "systick.h"
 #include "threads.h"
 #include "uart.h"
 
@@ -35,11 +36,8 @@ void test3(void *userdata)
 	busy_loop(userdata);
 }
 
-/* 72MHz */
-#define CPU_CLOCK_HZ 72000000
 
-/* 100 ms per tick. */
-#define TICK_RATE_HZ 10
+
 
 int main(void)
 {
@@ -48,18 +46,21 @@ int main(void)
 	usart_init();
 
 	if (thread_create(test1, (void *) str1) == -1)
+    {
 		print_str("Thread 1 creation failed\r\n");
+    }
 
 	if (thread_create(test2, (void *) str2) == -1)
+    {
 		print_str("Thread 2 creation failed\r\n");
+    }
 
 	if (thread_create(test3, (void *) str3) == -1)
+    {
 		print_str("Thread 3 creation failed\r\n");
+    }
 
-	/* SysTick configuration */
-	*SYSTICK_LOAD = (CPU_CLOCK_HZ / TICK_RATE_HZ) - 1UL;
-	*SYSTICK_VAL = 0;
-	*SYSTICK_CTRL = 0x07;
+    SysTick_init();
 
 	thread_start();
 

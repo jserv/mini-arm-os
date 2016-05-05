@@ -9,7 +9,7 @@
 #define SCB_ICSR_PENDSVSET  SCB_ICSR_PENDSVSET_Msk
 
 
-/* SysTick Memory Map */                                                                                    
+/* SysTick Mmory Map */                
 #define SYSTICK_CTRL        &(SysTick->CTRL)
 #define SYSTICK_LOAD        &(SysTick->LOAD)
 #define SYSTICK_VAL         &(SysTick->VAL)
