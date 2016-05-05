@@ -93,5 +93,22 @@ qemu: $(STM32P103_TARGET)
 	qemu-system-arm -M stm32-p103 -nographic -kernel $(STM32P103_TARGET_bin)
 
 
+flash: $(STM32F429_TARGET)
+	st-flash write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
+
+
+erase:
+	st-flash erase
+
+
+gdb: $(STM32F429_TARGET_elf)
+	@echo ""
+	@echo "Before execute this command,you should:"
+	@echo "Open another terminal,and execute the command:\"st-util\""
+	@echo ""
+	arm-none-eabi-gdb $^ -ex "target remote:4242"
+
+
+
 clean:
 	rm -rf $(RELEASE_DIR)
