@@ -2,6 +2,11 @@
 #include "systick.h"
 
 
+void systick_handler()
+{
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+}
+
 void SysTick_init(void)
 {
     /* SysTick configuration */

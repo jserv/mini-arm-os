@@ -45,10 +45,6 @@ void __attribute__((naked)) pendsv_handler()
 	}
 }
 
-void systick_handler()
-{
-	*SCB_ICSR |= SCB_ICSR_PENDSVSET;
-}
 
 void thread_start()
 {

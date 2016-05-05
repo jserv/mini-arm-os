@@ -2,6 +2,12 @@
 #include "systick.h"
 
 
+void systick_handler()
+{                                                                                                   
+    *SCB_ICSR |= SCB_ICSR_PENDSVSET;
+}
+
+
 void SysTick_init(void)
 {
     /* SysTick configuration */
