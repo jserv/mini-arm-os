@@ -78,8 +78,9 @@
 #define FLASH_ACR_LATENCY_0 ((uint8_t) 0x00)    /*!< Bit 0 */
 #define FLASH_ACR_PRFTBE    ((uint8_t) 0x10)    /*!< Prefetch Buffer Enable */
 
+
+
 #define HSE_STARTUP_TIMEOUT ((uint16_t) 0x0500) /*!< Time out for HSE start up */
-
-
+#define RECOMMAND_TIME_INTERVAL 1500
 
 #endif
