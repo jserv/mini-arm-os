@@ -30,24 +30,38 @@ make qemu
 
 Available commands:
 ----------------------
-- `make`
-  - Build all target's bin,elf,objdump files in "release"
-- `make STM32F429_os.bin`
-- `make STM32P103_os.bin`
-- `make clean`
-  - Remove the entire "release" directory
-- `make qemu`
-  - Build "STM32P103_os.bin" and run QEMU automatically.
-- `make flash`
-  - Build "STM32F429_os.bin" and flash the binary into STM32F429 with st-link toolchain.
-- `make erase`
-  - Sometimes,the STM32F429 will not be able to flash new binary file,then you will need this with st-link toolchain.
-  - Erase the entire flash on STM32F429.
-- `make gdb_ST-UTIL`
-  - Using GDB with ST-LINK on STM32F429.
-  - Remember to open another terminal,and type "st-util" to open "STLINK GDB Server"
-- `make cscope`
-  - The best friend with your powerful VIM!
+
+**Overall**
+  - `make`
+    - Build all target's bin,elf,objdump files in "release"
+  - `make clean`
+    - Remove the entire "release" directory
+  - `make cscope`
+    - The best friend with your powerful VIM!
+    - Producing cscope file in this project.
+
+**STM32P103(QEMU)**
+  - `make STM32P103_os.bin`
+    - Build "STM32P103_os.bin"
+  - `make qemu`
+    - Build "STM32P103_os.bin" and run QEMU automatically.
+  - `make qemu_GDBstub`
+    - Build "STM32P103_os.bin" and run QEMU with GDB stub and wait for remote GDB automatically.
+  - `make qemu_GDBconnect`
+    - Open remote GDB to connect to the QEMU GDB stub with port:1234(the default port).
+
+**STM32F429(physical device)**
+  - `make STM32F429_os.bin`
+    - Build "STM32F429_os.bin"
+  - `make flash`
+    - Build "STM32F429_os.bin" and flash the binary into STM32F429 with st-link toolchain.
+  - `make erase`
+    - Sometimes,the STM32F429 will not be able to flash new binary file,then you will need this with st-link toolchain.
+    - Erase the entire flash on STM32F429.
+  - `make gdb_ST-UTIL`
+    - Using GDB with ST-LINK on STM32F429.
+    - Remember to open another terminal,and type "st-util" to open "STLINK GDB Server"
+
 
 
 Directory Tree:
