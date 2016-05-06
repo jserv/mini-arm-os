@@ -272,6 +272,7 @@ void usart_init(void)
     enableUartPeripheralCLOCK();
     enableGPIO();
     enableUART();
+    print_str("USART initialized!\r\n");
 }
 
 void print_str(const char *str)

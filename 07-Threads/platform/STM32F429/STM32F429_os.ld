@@ -20,7 +20,9 @@ SECTIONS
 		*(.rodata.*)
 		_sromdev = .;
 		_eromdev = .;
+		. = ALIGN(4);
 		_sidata = .;
+		. = ALIGN(4);
 	} >FLASH
 
 	.data : AT(_sidata)
@@ -29,6 +31,7 @@ SECTIONS
 		*(.data)
 		*(.data*)
 		_edata = .;
+		. = ALIGN(4);
 	} >RAM
 
 	.bss :
@@ -36,6 +39,7 @@ SECTIONS
 		_sbss = .;
 		*(.bss)
 		_ebss = .;
+		. = ALIGN(4);
 	} >RAM
 
 	_estack = ORIGIN(RAM) + LENGTH(RAM);

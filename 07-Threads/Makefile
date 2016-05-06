@@ -94,7 +94,7 @@ qemu: $(STM32P103_TARGET)
 
 
 flash: $(STM32F429_TARGET)
-	st-flash write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
+	st-flash --reset write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
 
 
 erase:
