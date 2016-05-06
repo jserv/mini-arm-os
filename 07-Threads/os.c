@@ -14,7 +14,8 @@ static void delay(volatile int count)
 
 static void busy_loop(void *str)
 {
-	while (1) {
+	while (1) 
+    {
 		print_str(str);
 		print_str(": Running...\r\n");
 		delay(RECOMMAND_TIME_INTERVAL);

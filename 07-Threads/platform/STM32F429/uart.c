@@ -280,7 +280,7 @@ void print_str(const char *str)
     while (*str) {
         while (!(USART1->SR & USART_SR_TXE))
             ;
-        USART1->DR = (*str & 0x1FF);
+        USART1->DR = (*str & 0xFF);
         str++;
     }
 }
