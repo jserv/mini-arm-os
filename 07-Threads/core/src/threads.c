@@ -7,7 +7,8 @@
 #define THREAD_PSP	0xFFFFFFFD
 
 /* Thread Control Block */
-typedef struct {
+typedef struct 
+{
 	void *stack;
 	void *orig_stack;
 	uint8_t in_use;
@@ -26,15 +27,17 @@ void __attribute__((naked)) pendsv_handler()
 	/* Save the old task's context */
 	asm volatile("mrs   r0, psp\n"
 	             "stmdb r0!, {r4-r11, lr}\n");
-	/* To get the task pointer address from result r0 */
+	/* To save the last task's sp from r0 into its tcb*/
 	asm volatile("mov   %0, r0\n" : "=r" (tasks[lastTask].stack));
 
 	/* Find a new task to run */
-	while (1) {
+	while (1) 
+    {
 		lastTask++;
 		if (lastTask == MAX_TASKS)
 			lastTask = 0;
-		if (tasks[lastTask].in_use) {
+		if (tasks[lastTask].in_use) 
+        {
 			/* Move the task's stack pointer address into r0 */
 			asm volatile("mov r0, %0\n" : : "r" (tasks[lastTask].stack));
 			/* Restore the new task's context and jump to the task */
@@ -45,10 +48,6 @@ void __attribute__((naked)) pendsv_handler()
 	}
 }
 
-void systick_handler()
-{
-	*SCB_ICSR |= SCB_ICSR_PENDSVSET;
-}
 
 void thread_start()
 {
@@ -79,7 +78,8 @@ int thread_create(void (*run)(void *), void *userdata)
 	int threadId = 0;
 	uint32_t *stack;
 
-	for (threadId = 0; threadId < MAX_TASKS; threadId++) {
+	for (threadId = 0; threadId < MAX_TASKS; threadId++) 
+    {
 		if (tasks[threadId].in_use == 0)
 			break;
 	}
@@ -94,16 +94,19 @@ int thread_create(void (*run)(void *), void *userdata)
 		return -1;
 
 	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
-	if (first) {
+	if (first) 
+    {
 		stack[8] = (unsigned int) run;
 		stack[9] = (unsigned int) userdata;
 		first = 0;
-	} else {
+	} 
+    else 
+    {
 		stack[8] = (unsigned int) THREAD_PSP;
 		stack[9] = (unsigned int) userdata;
 		stack[14] = (unsigned) &thread_self_terminal;
 		stack[15] = (unsigned int) run;
-		stack[16] = (unsigned int) 0x21000000; /* PSR Thumb bit */
+		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 	}
 
 	/* Construct the control block */
