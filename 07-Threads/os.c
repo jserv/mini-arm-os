@@ -16,7 +16,7 @@ static void busy_loop(void *str)
 {
 	while (1) {
 		print_str(str);
-		print_str(": Running...\n");
+		print_str(": Running...\r\n");
 		delay(1000);
 	}
 }
