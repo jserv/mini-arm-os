@@ -97,13 +97,15 @@ erase:
 	st-flash erase
 
 
-gdb: $(STM32F429_TARGET_elf)
+gdb_ST-UTIL: $(STM32F429_TARGET_elf)
 	@echo ""
 	@echo "Before execute this command,you should:"
 	@echo "Open another terminal,and execute the command:\"st-util\""
 	@echo ""
 	arm-none-eabi-gdb $^ -ex "target remote:4242"
 
+cscope:
+	cscope -Rbqf ./cscope.out
 
 
 clean:
