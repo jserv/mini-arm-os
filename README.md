@@ -3,8 +3,8 @@ Build a minimal multi-tasking OS kernel for ARM from scratch
 From 00 to 07,read the following contents
 ===========================================
 **IMPORTANT:**
-If you are interested in 08-CMSIS,please jump to the corresponding part of the README:`README for 08-CMSIS`.
-This is because `08-CMSIS` has plenty of differences with `07-Threads`.
+If you are interested in 08-CMSIS,please jump to the corresponding part of the README:`Guide to Hacking 08-CMSIS`.
+This is because `08-CMSIS` has a plenty of differences with `07-Threads`.
 
 
 Prerequisites
@@ -54,7 +54,7 @@ make
 make qemu
 ```
 
-README for 08-CMSIS
+Guide to Hacking 08-CMSIS
 =========================================
 Preemptive round-robin scheduling with user-level threads on STM32F429i-Discovery(physical device) and STM32P103(qemu).
 
@@ -76,6 +76,7 @@ Prerequisites:
   - [NeoCon](http://wiki.openmoko.org/wiki/NeoCon) or [screen](http://www.commandlinefu.com/commands/view/6130/use-screen-as-a-terminal-emulator-to-connect-to-serial-consoles)
 - Not necessary tools
   - [Cscope](http://cscope.sourceforge.net/)
+  - [Astyle(Artistic Style)](http://astyle.sourceforge.net/)
 
 
 Support Devices:
@@ -89,7 +90,7 @@ Support Devices:
     - Assuming "qemu_stm32" directory in at "$HOME/workspace"
 ```
 export PATH=~/workspace/qemu_stm32/arm-softmmu:$PATH
-git clone git@github.com:JaredCJR/mini-arm-os-1.git
+git clone --recursive git@github.com:jserv/mini-arm-os.git
 cd ~/workspace/mini-arm-os-1/07-Threads
 make qemu
 ```
@@ -107,6 +108,8 @@ We assuming that your current directory is at `mini-arm-os/08-CMSIS`
   - `make cscope`
     - The best friend with your powerful VIM!
     - Producing cscope file in this project.
+  - `make astyle`
+    - Formatting all the ".c" and ".h" files in [Linux style](https://github.com/jserv/mini-arm-os/blob/master/coding-style.txt),excluding cmsis sub-module.
 
 **STM32-P103(QEMU)**
   - `make STM32P103_os.bin`
