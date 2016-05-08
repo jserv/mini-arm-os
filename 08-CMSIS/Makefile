@@ -12,8 +12,8 @@ RELEASE_DIR      := ./release
 PLATFORM_DIR     := ./platform
 CMSIS_DIR        := ./cmsis
 CORE_DIR         := ./core
-INC_DIR          := inc
-SRC_DIR          := src
+INC_DIR          := include
+SRC_DIR          := source
 CORE_HEADER_DIR  := $(CORE_DIR)/$(INC_DIR)/
 
 CORE_SOURCE  := $(wildcard $(CORE_DIR)/$(SRC_DIR)/*.c)
