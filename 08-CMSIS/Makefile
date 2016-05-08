@@ -35,8 +35,8 @@ $($(1)_TARGET):
 endef
 
 #Create corresponding compiler arguments to the device
-$(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))
 $(eval $(call eval_compiler_command,$(STM32P103_DEVICE)))
+$(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))
 
 .PHONY:erase cscope astyle clean
 
