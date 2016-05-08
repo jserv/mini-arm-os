@@ -1,93 +1,52 @@
 CROSS_COMPILE ?= arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
 AS := $(CROSS_COMPILE)as
-CORTEX_M3 := cortex-m3
-CORTEX_M4 := cortex-m4
+CORTEX_M3 := -mcpu=cortex-m3
+CORTEX_M4 := -mcpu=cortex-m4
 CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 	 -gdwarf-2 -g3 -Wall -Werror \
 	 	 -mthumb 
 
+#Naming your devices
+STM32P103_DEVICE := STM32P103
+STM32F429_DEVICE := STM32F429
 
-RELEASE_DIR      := ./release
-PLATFORM_DIR     := ./platform
-CMSIS_DIR        := ./cmsis
-CORE_DIR         := ./core
-INC_DIR          := include
-SRC_DIR          := source
-CORE_HEADER_DIR  := $(CORE_DIR)/$(INC_DIR)/
+#Device using Cortex-M4 CPU.Otherwise, treated as Cortex-M3(in uni_def)
+target_using_CM4_list := $(STM32F429_DEVICE)
 
-CORE_SOURCE  := $(wildcard $(CORE_DIR)/$(SRC_DIR)/*.c)
+#For those devices that does not need CMSIS
+target_NOT_using_CMSIS_list := $(STM32P103_DEVICE)
 
+#Universal Devices Defintion
+include rules.mk
 
-# Target:STM32P103 device
-STM32P103                       := STM32P103
-STM32P103_RELEASE_DIR           := $(RELEASE_DIR)/$(STM32P103)
-STM32P103_PLATFORM_DIR          := $(PLATFORM_DIR)/$(STM32P103)
-STM32P103_CMSIS_DIR             := $(CMSIS_DIR)  #This target does not need "CMSIS Memory Map."
+#Create corresponding device variable
+$(eval $(call eval_all_variable,$(STM32P103_DEVICE)))
+$(eval $(call eval_all_variable,$(STM32F429_DEVICE)))
 
-STM32P103_DEPENDENT_HEADER_DIR  := $(STM32P103_PLATFORM_DIR)/$(INC_DIR)/
-STM32P103_DEPENDENT_SOURCE      := $(wildcard $(STM32P103_PLATFORM_DIR)/$(SRC_DIR)/*.c)
-STM32P103_INC_DIR               := $(CORE_HEADER_DIR) $(STM32P103_DEPENDENT_HEADER_DIR)
+define eval_compiler_command
+$($(1)_TARGET): 
+	mkdir -p $($(1)_RELEASE_DIR)
+	$(CC) $(CFLAGS) $($(1)_CPU) -Wl,-T$($(1)_TARGET_ld) -nostartfiles \
+		  $(addprefix -I,$($(1)_INC_DIR)) \
+		  $(CORE_SOURCE) $($(1)_DEPENDENT_SOURCE) -o $($(1)_TARGET_elf)
+	$(CROSS_COMPILE)objcopy -Obinary $($(1)_TARGET_elf) $($(1)_TARGET_bin)
+	$(CROSS_COMPILE)objdump -S $($(1)_TARGET_elf) > $($(1)_TARGET_dump)
+endef
 
-STM32P103_TARGET_name           := $(STM32P103)_os
-STM32P103_TARGET                := $(STM32P103_TARGET_name).bin
-STM32P103_TARGET_ld             := $(STM32P103_PLATFORM_DIR)/os.ld
-STM32P103_TARGET_bin            := $(STM32P103_RELEASE_DIR)/$(STM32P103_TARGET_name).bin
-STM32P103_TARGET_elf            := $(STM32P103_RELEASE_DIR)/$(STM32P103_TARGET_name).elf
-STM32P103_TARGET_dump           := $(STM32P103_RELEASE_DIR)/$(STM32P103_TARGET_name).list
-###################
+#Create corresponding compiler arguments to the device
+$(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))
+$(eval $(call eval_compiler_command,$(STM32P103_DEVICE)))
 
+.PHONY:erase cscope astyle clean
 
-
-# Target:STM32F429 device
-STM32F429                       := STM32F429
-STM32F429_RELEASE_DIR           := $(RELEASE_DIR)/$(STM32F429)
-STM32F429_PLATFORM_DIR          := $(PLATFORM_DIR)/$(STM32F429)
-STM32F429_CMSIS_DIR             := $(CMSIS_DIR)/$(STM32F429)
-
-STM32F429_DEPENDENT_HEADER_DIR  := $(STM32F429_PLATFORM_DIR)/$(INC_DIR)/
-STM32F429_DEPENDENT_SOURCE      := $(wildcard $(STM32F429_PLATFORM_DIR)/$(SRC_DIR)/*.c)
-STM32F429_INC_DIR               := $(CORE_HEADER_DIR) $(STM32F429_DEPENDENT_HEADER_DIR) $(CMSIS_DIR) $(STM32F429_CMSIS_DIR)
-
-STM32F429_TARGET_name           := $(STM32F429)_os
-STM32F429_TARGET                := $(STM32F429_TARGET_name).bin
-STM32F429_TARGET_ld             := $(STM32F429_PLATFORM_DIR)/os.ld
-STM32F429_TARGET_bin            := $(STM32F429_RELEASE_DIR)/$(STM32F429_TARGET_name).bin
-STM32F429_TARGET_elf            := $(STM32F429_RELEASE_DIR)/$(STM32F429_TARGET_name).elf
-STM32F429_TARGET_dump           := $(STM32F429_RELEASE_DIR)/$(STM32F429_TARGET_name).list
-###################
-
-
-all: $(STM32P103_TARGET) $(STM32F429_TARGET)
-
-
-$(STM32P103_TARGET): $(CORE_SOURCE) $(STM32P103_DEPENDENT_SOURCE)
-	mkdir -p $(STM32P103_RELEASE_DIR)
-	$(CC) $(CFLAGS) -mcpu=$(CORTEX_M3) -Wl,-T$(STM32P103_TARGET_ld) -nostartfiles \
-		  $(addprefix -I,$(STM32P103_INC_DIR)) \
-		  $^ -o $(STM32P103_TARGET_elf)
-	$(CROSS_COMPILE)objcopy -Obinary $(STM32P103_TARGET_elf) $(STM32P103_TARGET_bin)
-	$(CROSS_COMPILE)objdump -S $(STM32P103_TARGET_elf) > $(STM32P103_TARGET_dump)
-
-
-
-$(STM32F429_TARGET): $(CORE_SOURCE) $(STM32F429_DEPENDENT_SOURCE)
-	mkdir -p $(STM32F429_RELEASE_DIR)
-	$(CC) $(CFLAGS) -mcpu=$(CORTEX_M4) -Wl,-T$(STM32F429_TARGET_ld) -nostartfiles \
-		  $(addprefix -I,$(STM32F429_INC_DIR)) \
-		  $^ -o $(STM32F429_TARGET_elf)
-	$(CROSS_COMPILE)objcopy -Obinary $(STM32F429_TARGET_elf) $(STM32F429_TARGET_bin)
-	$(CROSS_COMPILE)objdump -S $(STM32F429_TARGET_elf) > $(STM32F429_TARGET_dump)
-
-
+all:  $(STM32P103_TARGET) $(STM32F429_TARGET)
 
 flash: $(STM32F429_TARGET)
 	st-flash --reset write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
 
-
 erase:
 	st-flash erase
-
 
 gdb_ST-UTIL: $(STM32F429_TARGET_elf)
 	@echo ""
@@ -96,13 +55,11 @@ gdb_ST-UTIL: $(STM32F429_TARGET_elf)
 	@echo ""
 	arm-none-eabi-gdb $^ -ex "target remote:4242"
 
-
 qemu: $(STM32P103_TARGET)
 	@qemu-system-arm -M ? | grep stm32-p103 >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
 	qemu-system-arm -M stm32-p103 -nographic -kernel $(STM32P103_TARGET_bin)
-
 
 qemu_GDBstub: $(STM32P103_TARGET)
 	@echo ""
@@ -110,10 +67,8 @@ qemu_GDBstub: $(STM32P103_TARGET)
 	@echo ""
 	qemu-system-arm -M stm32-p103 -nographic -kernel $(STM32P103_TARGET_bin) -s -S
 
-
 qemu_GDBconnect: $(STM32P103_TARGET_elf)
 	arm-none-eabi-gdb $^ -ex "target remote:1234"
-
 
 cscope:
 	cscope -Rbqf ./cscope.out
@@ -123,6 +78,6 @@ astyle:
 	astyle --style=linux --indent=tab -p -U -K -H --suffix=none --exclude=cmsis --recursive ./*.c
 	astyle --style=linux --indent=tab -p -U -K -H --suffix=none --exclude=cmsis --recursive ./*.h
 
-
 clean:
 	rm -rf $(RELEASE_DIR)
+
