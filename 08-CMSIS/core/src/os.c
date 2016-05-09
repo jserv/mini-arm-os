@@ -3,7 +3,7 @@
 #include "reg.h"
 #include "systick.h"
 #include "threads.h"
-#include "uart.h"
+#include "stream.h"
 
 
 static void delay(volatile int count)
@@ -16,8 +16,8 @@ static void delay(volatile int count)
 static void busy_loop(void *str)
 {
 	while (1) {
-		print_str(str);
-		print_str(": Running...\r\n");
+		stream_write(USART, str);
+		stream_write(USART, ": Running...\r\n");
 		delay(RECOMMAND_TIME_INTERVAL);
 	}
 }
@@ -41,18 +41,18 @@ int main(void)
 {
 	const char *str1 = "Task1", *str2 = "Task2", *str3 = "Task3";
 
-	usart_init();
+	stream_init(USART);
 
 	if (thread_create(test1, (void *) str1) == -1) {
-		print_str("Thread 1 creation failed\r\n");
+		stream_write(USART, "Thread 1 creation failed\r\n");
 	}
 
 	if (thread_create(test2, (void *) str2) == -1) {
-		print_str("Thread 2 creation failed\r\n");
+		stream_write(USART, "Thread 2 creation failed\r\n");
 	}
 
 	if (thread_create(test3, (void *) str3) == -1) {
-		print_str("Thread 3 creation failed\r\n");
+		stream_write(USART, "Thread 3 creation failed\r\n");
 	}
 
 	SysTick_init();

@@ -255,15 +255,15 @@ static void enableUART(void)
 /*
  * USART1: Tx=PA9 , Rx=PA10
  */
-void usart_init(void)
+void uart_init(void)
 {
 	enableUartPeripheralCLOCK();
 	enableGPIO();
 	enableUART();
-	print_str("USART initialized!\r\n");
+	uart_write("USART initialized!\r\n");
 }
 
-void print_str(const char *str)
+void uart_write(const char *str)
 {
 	while (*str) {
 		while (!(USART1->SR & USART_SR_TXE))

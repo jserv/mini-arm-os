@@ -7,7 +7,7 @@
  */
 #define USART_FLAG_TXE  ((uint16_t) 0x0080)
 
-void usart_init(void)
+void uart_init(void)
 {
 	*(RCC_APB2ENR) |= (uint32_t)(0x00000001 | 0x00000004);
 	*(RCC_APB1ENR) |= (uint32_t)(0x00020000);
@@ -25,7 +25,7 @@ void usart_init(void)
 	*(USART2_CR1) |= 0x2000;
 }
 
-void print_str(const char *str)
+void uart_write(const char *str)
 {
 	while (*str) {
 		while (!(*(USART2_SR) & USART_FLAG_TXE));
