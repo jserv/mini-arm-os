@@ -7,10 +7,12 @@ CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 	 -gdwarf-2 -g3 -Wall -Werror \
 	 	 -mthumb 
 
+#devices vendor
+STM32 := STM32
 
 #Naming your devices
-STM32P103_DEVICE := STM32P103
-STM32F429_DEVICE := STM32F429
+STM32P103_DEVICE := p103
+STM32F429_DEVICE := f429disco
 
 #Device using Cortex-M4 CPU.Otherwise, treated as Cortex-M3(in uni_def)
 target_using_CM4_list := $(STM32F429_DEVICE)
@@ -22,8 +24,8 @@ target_NOT_using_CMSIS_list := $(STM32P103_DEVICE)
 include rules.mk
 
 #Create corresponding device variable
-$(eval $(call eval_all_variable,$(STM32P103_DEVICE)))
-$(eval $(call eval_all_variable,$(STM32F429_DEVICE)))
+$(eval $(call eval_all_variable,$(STM32P103_DEVICE),$(STM32)))
+$(eval $(call eval_all_variable,$(STM32F429_DEVICE),$(STM32)))
 
 define compiler_command
 	mkdir -p $($(1)_RELEASE_DIR)
@@ -48,37 +50,37 @@ PLAT ?= $(STM32P103_DEVICE)
 
 .PHONY:all target
 
-all:  $(STM32P103_TARGET) $(STM32F429_TARGET)
+all:  $($(STM32F429_DEVICE)_TARGET) $($(STM32P103_DEVICE)_TARGET)
 
 target:
 	$(call compiler_command,$(PLAT))
 
-flash: $(STM32F429_TARGET)
-	st-flash --reset write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
+flash: $($(STM32F429_DEVICE)_TARGET)
+	st-flash --reset write $($(STM32F429_DEVICE)_RELEASE_DIR)/$^ 0x8000000
 
 erase:
 	st-flash erase
 
-gdb_ST-UTIL: $(STM32F429_TARGET_elf)
+gdb_ST-UTIL: $($(STM32F429_DEVICE)_TARGET_elf)
 	@echo ""
 	@echo "Before execute this command,you should:"
 	@echo "Open another terminal,and execute the command:\"st-util\""
 	@echo ""
 	arm-none-eabi-gdb $^ -ex "target remote:4242"
 
-qemu: $(STM32P103_TARGET)
+qemu: $($(STM32P103_DEVICE)_TARGET)
 	@qemu-system-arm -M ? | grep stm32-p103 >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo
-	qemu-system-arm -M stm32-p103 -nographic -kernel $(STM32P103_TARGET_bin)
+	qemu-system-arm -M stm32-p103 -nographic -kernel $($(STM32P103_DEVICE)_TARGET_bin)
 
-qemu_GDBstub: $(STM32P103_TARGET)
+qemu_GDBstub: $($(STM32P103_DEVICE)_TARGET)
 	@echo ""
 	@echo "Open another terminal,and type \"make qemu_GDBconnect\""
 	@echo ""
-	qemu-system-arm -M stm32-p103 -nographic -kernel $(STM32P103_TARGET_bin) -s -S
+	qemu-system-arm -M stm32-p103 -nographic -kernel $($(STM32P103_DEVICE)_TARGET_bin) -s -S
 
-qemu_GDBconnect: $(STM32P103_TARGET_elf)
+qemu_GDBconnect: $($(STM32P103_DEVICE)_TARGET_elf)
 	arm-none-eabi-gdb $^ -ex "target remote:1234"
 
 cscope:

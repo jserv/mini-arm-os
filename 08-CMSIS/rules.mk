@@ -4,7 +4,7 @@ PLATFORM_DIR     := ./platform
 CMSIS_DIR        := ./cmsis
 CORE_DIR         := ./core
 INC_DIR          := include
-SRC_DIR          := source
+SRC_DIR          := src
 CORE_HEADER_DIR  := $(CORE_DIR)/$(INC_DIR)/
 
 CORE_SOURCE  := $(wildcard $(CORE_DIR)/$(SRC_DIR)/*.c)
@@ -18,7 +18,7 @@ define uni_def_1
 
 $(1)_RELEASE_DIR           := $(RELEASE_DIR)/$(1)
 $(1)_PLATFORM_DIR          := $(PLATFORM_DIR)/$(1)
-$(1)_CMSIS_DIR             := $(CMSIS_DIR)/$(1)
+$(1)_CMSIS_DIR             := $(CMSIS_DIR)/$(2)$(1)
 
 endef
 
@@ -62,7 +62,7 @@ endef
 
 
 define eval_all_variable
-    $(eval $(call uni_def_1,$(1)) )
+    $(eval $(call uni_def_1,$(1),$(2)) )
     $(eval $(call uni_def_2,$(1)) )
     $(eval $(call uni_def_3,$(1)) )
     $(eval $(call uni_def_4,$(1)) )
