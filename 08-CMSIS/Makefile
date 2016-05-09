@@ -27,7 +27,8 @@ include rules.mk
 $(eval $(call eval_all_variable,$(STM32P103_DEVICE),$(STM32)))
 $(eval $(call eval_all_variable,$(STM32F429_DEVICE),$(STM32)))
 
-define compiler_command
+
+define build_command
 	mkdir -p $($(1)_RELEASE_DIR)
 	$(CC) $(CFLAGS) $($(1)_CPU) -Wl,-T$($(1)_TARGET_ld) -nostartfiles \
 		  $(addprefix -I,$($(1)_INC_DIR)) \
@@ -36,24 +37,24 @@ define compiler_command
 	$(CROSS_COMPILE)objdump -S $($(1)_TARGET_elf) > $($(1)_TARGET_dump)
 endef
 
-define eval_compiler_command
+define eval_build_command
 $($(1)_TARGET):
-	$(call compiler_command,$(1))
+	$(call build_command,$(1))
 endef
 
-#Create corresponding compiler arguments to the device
-$(eval $(call eval_compiler_command,$(STM32P103_DEVICE)))
-$(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))
+#Create corresponding build command to the device
+$(eval $(call eval_build_command,$(STM32P103_DEVICE)))
+$(eval $(call eval_build_command,$(STM32F429_DEVICE)))
 
 #default target
 PLAT ?= $(STM32P103_DEVICE)
 
-.PHONY:all target
+.PHONY:all target clean cscope astyle
 
 all:  $($(STM32F429_DEVICE)_TARGET) $($(STM32P103_DEVICE)_TARGET)
 
 target:
-	$(call compiler_command,$(PLAT))
+	$(call build_command,$(PLAT))
 
 flash: $($(STM32F429_DEVICE)_TARGET)
 	st-flash --reset write $($(STM32F429_DEVICE)_RELEASE_DIR)/$^ 0x8000000

@@ -1,4 +1,3 @@
-
 RELEASE_DIR      := ./release
 PLATFORM_DIR     := ./platform
 CMSIS_DIR        := ./cmsis
