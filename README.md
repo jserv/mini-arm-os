@@ -1,6 +1,5 @@
 Build a minimal multi-tasking OS kernel for ARM from scratch
 
-There are 8 versions,please read the corresponding parts.
 
 From 00 to 07,read the following contents
 ===========================================
@@ -64,7 +63,7 @@ Preemptive round-robin scheduling with user-level threads on STM32F429i-Discover
 How to get the full functional source code:
 -----------------------------------------------
 ```
-git clone --recursive git@github.com:jserv/mini-arm-os.git
+git clone --recursive https://github.com/jserv/mini-arm-os.git
 cd mini-arm-os/08-CMSIS
 ```
 
@@ -105,7 +104,7 @@ We assuming that your current directory is at `mini-arm-os/08-CMSIS`
 **Overall**
   - `make all`
     - Build all target's bin,elf,objdump files in "release"
-    - NOTE: `make` =/= `make all` here. This is because this Makefile use `eval` for `targets`.
+    - NOTE: `make` doe NOT equal to `make all` here. This is because this Makefile use `eval` for `targets`.
   - `make clean`
     - Remove the entire "release" directory
   - `make cscope`
@@ -115,22 +114,22 @@ We assuming that your current directory is at `mini-arm-os/08-CMSIS`
     - Formatting all the ".c" and ".h" files in [Linux style](https://github.com/jserv/mini-arm-os/blob/master/coding-style.txt),excluding the cmsis sub-module.
 
 **STM32-P103(QEMU)**
-  - `make STM32P103.bin`
-    - Build "STM32P103.bin"
+  - `make p103` or `make target PLAT=p103`
+    - Build "p103.bin"
   - `make qemu`
-    - Build "STM32P103.bin" and run QEMU automatically.
+    - Build "p103.bin" and run QEMU automatically.
   - `make qemu_GDBstub`
-    - Build "STM32P103.bin" and run QEMU with GDB stub and wait for remote GDB automatically.
+    - Build "p103.bin" and run QEMU with GDB stub and wait for remote GDB automatically.
   - `make qemu_GDBconnect`
     - Open remote GDB to connect to the QEMU GDB stub with port:1234(the default port).
 
 **STM32F429i-Discovery(physical device)**
-  - `make STM32F429.bin`
-    - Build "STM32F429.bin"
+  - `make f429disco` or `make target PLAT=f429disco`
+    - Build "f429disco.bin"
   - `make flash`
-    - Build "STM32F429.bin" and flash the binary into STM32F429 with st-link toolchain.
+    - Build "f429disco.bin" and flash the binary into STM32F429 with st-link toolchain.
   - `make erase`
-    - Sometimes,the STM32F429 will not be able to flash new binary file,then you will need this with st-link toolchain.
+    - Sometimes,the STM32F429i-Discovery will not be able to flash new binary file,then you will need this with st-link toolchain.
     - Erase the entire flash on STM32F429.
   - `make gdb_ST-UTIL`
     - Using GDB with ST-LINK on STM32F429.
@@ -179,7 +178,7 @@ Introducing your CMSIS for your target,where it should be in the [mbed repo](htt
 For example,the CMSIS for STM32F429 could be found [here](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
 We only need ".h" files,do not copy any ".c" files.
 Put the header files into "cmsis/LPC_EXAMPLE"
-[cmsis](https://github.com/JaredCJR/cmsis) is a submodule in this project,maintianed by [JaredCJR](https://github.com/JaredCJR).
+[cmsis](https://github.com/JaredCJR/cmsis) is a submodule in this project,maintianed by [Jia-Rung Chang](https://github.com/JaredCJR).
 Pull request is welcome!
 
 
@@ -205,16 +204,22 @@ Most of the rules are reusable,so all you need is copy-n-paste , modifying the v
 - `rules.mk` 
   - You should not modify it!All of the rules are encapsulation into macro,which is used in `Makefile`.
 - `Makefile`:
+  - If your device vendor name does not exist,create new variable and assign name to it!
+    - Ex:`STM32 := STM32`
   - Add your device name
     - Ex:`STM32F429_DEVICE := STM32F429`
   - Check your device CPU type(Cortex-M3/4)
     - In `target_using_CM4_list`
   - Will you use CMSIS?
     - If NOT,add to `target_NOT_using_CMSIS_list`
-  - Use the predefined macro to produce the corresponding directory and device specific variable
-    - Ex:`$(eval $(call eval_all_variable,$(STM32F429_DEVICE)))`
-  - Use the predefined macro to produce the corresponding GCC toolchain variables
-    - Ex: `$(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))`
+  - Use the predefined macro to produce the corresponding directory and device specific variable(device name,vendor name)
+    - Ex:`$(eval $(call eval_all_variable,$(STM32F429_DEVICE),$(STM32)))`
+    - The `vendor name` is used in the `cmsis` directory name.They must corresponding to each other.
+  - Use the predefined macro to produce the corresponding GCC toolchain commands
+    - Ex: `$(eval $(call eval_build_command,$(STM32F429_DEVICE)))`
+  - Add your device name to `all`
+    - In the specific form:`$($(YOUR_DEVICE_NAME)_TARGET)` ,this variable will be automatic derived by `rules.mk`
+    - Ex: `$($(STM32F429_DEVICE)_TARGET)`
 
 
 **STEP 5.**
@@ -226,7 +231,7 @@ Now,you can try the "Available commands" in this README.
 Licensing
 ---------
 `mini-arm-os` is freely redistributable under the two-clause BSD License.
-Use of this source code is governed by a BSD-style license that can be found`
+Use of this source code is governed by a BSD-style license that can be found
 in the `LICENSE` file.
 
 Reference
