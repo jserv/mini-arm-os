@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include "malloc.h"
-#include "os.h"
+#include "config.h"
 
 typedef long Align;
 
