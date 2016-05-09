@@ -12,7 +12,7 @@ CORE_SOURCE  := $(wildcard $(CORE_DIR)/$(SRC_DIR)/*.c)
 
 # Universal Devices Definition
 
-# The reason why we need uni_def_1 to uni_def_4,instead just one macro:
+# The reason why we need uni_def_1 to uni_def_4,instead of just one macro:
 # http://stackoverflow.com/questions/35476588/makefile-rule-not-a-target-when-using-eval
 define uni_def_1
 
@@ -52,7 +52,7 @@ $(foreach t,
           endif
 )
 
-$(1)_TARGET                := $(1).bin
+$(1)_TARGET                := $(1)
 $(1)_TARGET_ld             := $($(1)_PLATFORM_DIR)/os.ld
 $(1)_TARGET_bin            := $($(1)_RELEASE_DIR)/$(1).bin
 $(1)_TARGET_elf            := $($(1)_RELEASE_DIR)/$(1).elf

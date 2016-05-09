@@ -7,6 +7,7 @@ CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 	 -gdwarf-2 -g3 -Wall -Werror \
 	 	 -mthumb 
 
+
 #Naming your devices
 STM32P103_DEVICE := STM32P103
 STM32F429_DEVICE := STM32F429
@@ -24,8 +25,7 @@ include rules.mk
 $(eval $(call eval_all_variable,$(STM32P103_DEVICE)))
 $(eval $(call eval_all_variable,$(STM32F429_DEVICE)))
 
-define eval_compiler_command
-$($(1)_TARGET): 
+define compiler_command
 	mkdir -p $($(1)_RELEASE_DIR)
 	$(CC) $(CFLAGS) $($(1)_CPU) -Wl,-T$($(1)_TARGET_ld) -nostartfiles \
 		  $(addprefix -I,$($(1)_INC_DIR)) \
@@ -34,13 +34,24 @@ $($(1)_TARGET):
 	$(CROSS_COMPILE)objdump -S $($(1)_TARGET_elf) > $($(1)_TARGET_dump)
 endef
 
+define eval_compiler_command
+$($(1)_TARGET):
+	$(call compiler_command,$(1))
+endef
+
 #Create corresponding compiler arguments to the device
 $(eval $(call eval_compiler_command,$(STM32P103_DEVICE)))
 $(eval $(call eval_compiler_command,$(STM32F429_DEVICE)))
 
-.PHONY:erase cscope astyle clean
+#default target
+PLAT ?= $(STM32P103_DEVICE)
+
+.PHONY:all target
 
 all:  $(STM32P103_TARGET) $(STM32F429_TARGET)
+
+target:
+	$(call compiler_command,$(PLAT))
 
 flash: $(STM32F429_TARGET)
 	st-flash --reset write $(STM32F429_RELEASE_DIR)/$^ 0x8000000
