@@ -89,6 +89,7 @@ Support Devices:
   - [How to build QEMU environment by NCKU](http://wiki.csie.ncku.edu.tw/embedded/Lab39)
   - If QEMU is ready
     - Assuming "qemu_stm32" directory in at "$HOME/workspace"
+  - STM32F429i-Discovery uses USART1(Tx=PA9,Rx=PA10,baud rate=115200) as default serial port.
 ```
 export PATH=~/workspace/qemu_stm32/arm-softmmu:$PATH
 git clone --recursive git@github.com:jserv/mini-arm-os.git

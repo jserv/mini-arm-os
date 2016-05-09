@@ -49,17 +49,17 @@ $(eval $(call eval_build_command,$(STM32F429_DEVICE)))
 #default target
 PLAT ?= $(STM32P103_DEVICE)
 
-.PHONY:all target clean cscope astyle
+.PHONY:all target clean cscope astyle st-flash st-erase
 
 all:  $($(STM32F429_DEVICE)_TARGET) $($(STM32P103_DEVICE)_TARGET)
 
 target:
 	$(call build_command,$(PLAT))
 
-flash: $($(STM32F429_DEVICE)_TARGET)
-	st-flash --reset write $($(STM32F429_DEVICE)_RELEASE_DIR)/$^ 0x8000000
+st-flash: $($(STM32F429_DEVICE)_TARGET)
+	st-flash --reset write $($(STM32F429_DEVICE)_TARGET_bin) 0x8000000
 
-erase:
+st-erase:
 	st-flash erase
 
 gdb_ST-UTIL: $($(STM32F429_DEVICE)_TARGET_elf)
