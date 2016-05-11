@@ -49,22 +49,20 @@ void __attribute__((naked)) pendsv_handler()
 void thread_start()
 {
 	lastTask = 0;
+	CONTROL_Type PSP_in_Thread_mode;
+	PSP_in_Thread_mode.b.nPRIV = 1;
+	PSP_in_Thread_mode.b.SPSEL = 1;
 
 	/* Save kernel context */
 	asm volatile("mrs ip, psr\n"
 	             "push {r4-r11, ip, lr}\n");
 
-	/* To bridge the variable in C and the register in ASM,
-	 * move the task's stack pointer address into r0.
-	 * http://www.ethernut.de/en/documents/arm-inline-asm.html
-	 */
-	asm volatile("mov r0, %0\n" : : "r"(tasks[lastTask].stack));
 	/* Load user task's context and jump to the task */
-	asm volatile("msr psp, r0\n"
-	             "mov r0, #3\n"
-	             "msr control, r0\n"
-	             "isb\n"
-	             "pop {r4-r11, lr}\n"
+	__set_PSP((uint32_t)tasks[lastTask].stack);
+	__set_CONTROL(PSP_in_Thread_mode.w);
+	__ISB();
+
+	asm volatile("pop {r4-r11, lr}\n"
 	             "pop {r0}\n"
 	             "bx lr\n");
 }
@@ -122,9 +120,9 @@ void thread_self_terminal()
 	/* This will kill the stack.
 	 * For now, disable context switches to save ourselves.
 	 */
-	asm volatile("cpsid i\n");
+	__disable_irq();
 	thread_kill(lastTask);
-	asm volatile("cpsie i\n");
+	__enable_irq();
 
 	/* And now wait for death to kick in */
 	while (1);

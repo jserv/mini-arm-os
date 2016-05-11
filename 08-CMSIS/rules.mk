@@ -27,7 +27,7 @@ $(1)_DEPENDENT_SOURCE      := $(wildcard $($(1)_PLATFORM_DIR)/$(SRC_DIR)/*.c)
 endef
 
 define uni_def_3
-$(1)_INC_DIR               := $(CORE_HEADER_DIR)  $($(1)_DEPENDENT_HEADER_DIR)
+$(1)_INC_DIR               := $(CORE_HEADER_DIR) $($(1)_DEPENDENT_HEADER_DIR) $(CMSIS_DIR)
 endef
 
 define uni_def_4
