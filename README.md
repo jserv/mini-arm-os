@@ -80,16 +80,22 @@ Prerequisites:
   - [Astyle(Artistic Style)](http://astyle.sourceforge.net/)
 
 
-Support Devices:
+Quick Start / Support Devices:
 -------------------------------------
 - [STM32F429i-Discovery(physical devices)](http://www2.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f429idiscovery.html)
   - [Details in Chinese by NCKU](http://wiki.csie.ncku.edu.tw/embedded/STM32F429)
+  - STM32F429i-Discovery uses `USART1(Tx=PA9,Rx=PA10,baud rate=115200)` as default serial port here.
+    - You will a terminal emulator,such as `screen`
+      - Installation on Ubuntu / Debian based systems:
+      `sudo apt-get install screen`
+      - Then, attach the device file where a serial to USB converter is attached:
+      `screen /dev/ttyUSB0 115200 8n1`
+      - Once you want to quit screen, press: `Ctrl-a k`
 
 - [STM32-P103(emulator)](http://beckus.github.io/qemu_stm32/)
   - [How to build QEMU environment by NCKU](http://wiki.csie.ncku.edu.tw/embedded/Lab39)
   - If QEMU is ready
     - Assuming "qemu_stm32" directory in at "$HOME/workspace"
-  - STM32F429i-Discovery uses USART1(Tx=PA9,Rx=PA10,baud rate=115200) as default serial port.
 ```
 export PATH=~/workspace/qemu_stm32/arm-softmmu:$PATH
 git clone --recursive git@github.com:jserv/mini-arm-os.git
@@ -100,14 +106,14 @@ make qemu
 Available commands:
 -----------------------------------
 **IMPORTANT:**
-We assuming that your current directory is at `mini-arm-os/08-CMSIS`
+We assuming that your current directory is at `mini-arm-os/08-CMSIS`.
 
 **Overall**
   - `make all`
-    - Build all target's bin,elf,objdump files in "release"
+    - Build all target's bin,elf,objdump files in the "release" directory.
     - NOTE: `make` doe NOT equal to `make all` here. This is because this Makefile use `eval` for `targets`.
   - `make clean`
-    - Remove the entire "release" directory
+    - Remove the entire "release" directory.
   - `make cscope`
     - The best friend with your powerful VIM!
     - Producing cscope file in this project.
@@ -139,22 +145,25 @@ We assuming that your current directory is at `mini-arm-os/08-CMSIS`
 Directory Tree:
 -------------------------------
 - core
-  - Hardware independent source and header files
+  - Hardware independent source and header files.
 - platform
-  - Hardware dependent source and header files
+  - Hardware dependent source and header files.
 - cmsis
   - With cmsis,porting would be much easier!
 - release
   - This directory will be create after "Target" in Makefile is called.
   - Containing the elf,bin,objdump files in corresponding directory.
-  - "make clean" will remove the entire directory,do not put personal files inside it!
+  - `make clean` will remove the entire directory,do not put personal files inside it!
 
 
 Porting Guide:
 ------------------------------------
 You should know what is [CMSIS](http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php),and why it save us a lot of efforts.
 
-`cmsis` is a submodule from [JaredCJR/cmsis](https://github.com/JaredCJR/cmsis).
+`cmsis` is a submodule from [JaredCJR/cmsis](https://github.com/JaredCJR/cmsis),which is maintained by Jia-Rung Chang.
+You should keep `cmsis` version(commit) is updated with the current version of your `mini-arm-os`.
+The version can be seen on the website.
+Ex. `cmsis @ f373d77` in `mini-arm-os/08-CMSIS` on website. `f373d77` indicating the submodule version synchronous with the main git.
 
 The full project can be divide into two layer:
 - hardware-dependent layer(Hardware abstruction Layer,HAL)
@@ -168,18 +177,29 @@ Following the steps below,then you can run this os on your own devices!
 ----------------------------------------------------------------------------
 
 **STEP 1.**
-Select a target name for your device,such as STM32F429
-In this guide,we assume its name is "LPC_EXAMPLE".
-Create "LPC_EXAMPLE" directory in "platform" and "cmsis" directory.
-Create "inc" and "src" directory in "platform/LPC_EXAMPLE/"
+Select a target name for your device,such as `f429disco`.
+
+In this guide,we will assume its name is "example_device" with vendor name "LPC".
+
+Create `example_device` directory in "platform" and `LPCexample_device` directory in "cmsis" directory.
+
+Create "include" and "src" directory in "platform/example_device/"
+
+
+
 
 
 **STEP 2.**
 Introducing your CMSIS for your target,where it should be in the [mbed repo](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis).
-For example,the CMSIS for STM32F429 could be found [here](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
+
+For example,the CMSIS for STM32F429i-discovery could be found [here](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
+
 We only need ".h" files,do not copy any ".c" files.
-Put the header files into "cmsis/LPC_EXAMPLE"
+
+Put the header files into `cmsis/LPCexample_device`.
+
 [cmsis](https://github.com/JaredCJR/cmsis) is a submodule in this project,maintianed by [Jia-Rung Chang](https://github.com/JaredCJR).
+
 Pull request is welcome!
 
 
@@ -189,26 +209,39 @@ You need to sovle it mannually.
 Usually,it may be some file missing caused by some specific "define".You could just comment out that definition to solve the question.
 
 
+
+
+
 **STEP 3.**
 This is the most difficult part.
-You have to implement the files in "platform/NXP_EXAMPLE/inc/" and "platform/NXP_EXAMPLE/src/"
+
+You have to implement the files in `platform/example_device/include/` and `platform/example_device/src/`.
+
 According to different device vendor(such as STM,NXP,etc),the implementation is very different.
-Please look into the current example:STM32F429,and you will figure it out!
+
+Please look into the current example:`f429disco`,and you will figure it out!
+
 The function interface must be as same as the function interface in "platform/STM32F429/inc/" due to this is HAL for the entire project.
+
+
+
 
 
 **STEP 4.**
 Add your target rules into Makefile.
-Please look the example "STM32F429" in Makefile.
+
+Please look the example `f429disco` in the Makefile.
+
 Most of the rules are reusable,so all you need is copy-n-paste , modifying the variable/target name and knowing what gcc arguments suit your target!
 
 - `rules.mk` 
-  - You should not modify it!All of the rules are encapsulation into macro,which is used in `Makefile`.
+  - You should `NOT` modify this file!
+  - All of the rules are encapsulation into macro,which is used in `Makefile`.
 - `Makefile`:
   - If your device vendor name does not exist,create new variable and assign name to it!
     - Ex:`STM32 := STM32`
   - Add your device name
-    - Ex:`STM32F429_DEVICE := STM32F429`
+    - Ex:`STM32F429_DEVICE := f429disco`
   - Check your device CPU type(Cortex-M3/4)
     - In `target_using_CM4_list`
   - Will you use CMSIS?
@@ -218,13 +251,18 @@ Most of the rules are reusable,so all you need is copy-n-paste , modifying the v
     - The `vendor name` is used in the `cmsis` directory name.They must corresponding to each other.
   - Use the predefined macro to produce the corresponding GCC toolchain commands
     - Ex: `$(eval $(call eval_build_command,$(STM32F429_DEVICE)))`
+    - This will derive lots of variables that you don't see in the `Makefile`.
   - Add your device name to `all`
     - In the specific form:`$($(YOUR_DEVICE_NAME)_TARGET)` ,this variable will be automatic derived by `rules.mk`
     - Ex: `$($(STM32F429_DEVICE)_TARGET)`
 
 
+
+
+
 **STEP 5.**
 Congratulations!
+
 Now,you can try the "Available commands" in this README.
 
 
