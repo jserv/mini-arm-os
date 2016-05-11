@@ -5,6 +5,9 @@
 #include "threads.h"
 #include "stream.h"
 
+#define puts(x) do {                       \
+                   stream_write(USART,x);  \
+                }while(0)
 
 static void delay(volatile int count)
 {
@@ -16,8 +19,8 @@ static void delay(volatile int count)
 static void busy_loop(void *str)
 {
 	while (1) {
-		stream_write(USART, str);
-		stream_write(USART, ": Running...\r\n");
+		puts(str);
+		puts(": Running...\r\n");
 		delay(RECOMMAND_TIME_INTERVAL);
 	}
 }
@@ -44,15 +47,15 @@ int main(void)
 	stream_init(USART);
 
 	if (thread_create(test1, (void *) str1) == -1) {
-		stream_write(USART, "Thread 1 creation failed\r\n");
+		puts("Thread 1 creation failed\r\n");
 	}
 
 	if (thread_create(test2, (void *) str2) == -1) {
-		stream_write(USART, "Thread 2 creation failed\r\n");
+		puts("Thread 2 creation failed\r\n");
 	}
 
 	if (thread_create(test3, (void *) str3) == -1) {
-		stream_write(USART, "Thread 3 creation failed\r\n");
+		puts("Thread 3 creation failed\r\n");
 	}
 
 	SysTick_init();
