@@ -18,7 +18,7 @@ STM32F429_DEVICE := f429disco
 target_using_CM4_list := $(STM32F429_DEVICE)
 
 #For those devices that does not need CMSIS
-target_NOT_using_CMSIS_list := $(STM32P103_DEVICE)
+target_NOT_using_CMSIS_list := 
 
 #Universal Devices Defintion
 include rules.mk
