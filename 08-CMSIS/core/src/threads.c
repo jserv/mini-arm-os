@@ -49,7 +49,7 @@ void __attribute__((naked)) pendsv_handler()
 void thread_start()
 {
 	lastTask = 0;
-	CONTROL_Type setPSP_Thread = {
+	CONTROL_Type user_ctx = {
 		.b.nPRIV = 1,
 		.b.SPSEL = 1
 	};
@@ -60,7 +60,7 @@ void thread_start()
 
 	/* Load user task's context and jump to the task */
 	__set_PSP((uint32_t)tasks[lastTask].stack);
-	__set_CONTROL(setPSP_Thread.w);
+	__set_CONTROL(user_ctx.w);
 	__ISB();
 
 	asm volatile("pop {r4-r11, lr}\n"
