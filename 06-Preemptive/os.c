@@ -59,7 +59,7 @@ void delay(volatile int count)
 #define THREAD_MSP	0xFFFFFFF9
 #define THREAD_PSP	0xFFFFFFFD
 
-/* Initilize user task stack and execute it one time */
+/* Initialize user task stack and execute it one time */
 
 /* XXX: Implementation of task creation is a little bit tricky.
  * We called `activate()` which is returning from exception.

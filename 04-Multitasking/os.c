@@ -47,7 +47,7 @@ void print_str(const char *str)
 #define THREAD_MSP	0xFFFFFFF9
 #define THREAD_PSP	0xFFFFFFFD
 
-/* Initilize user task stack and execute it one time */
+/* Initialize user task stack and execute it one time */
 /* XXX: Implementation of task creation is a little bit tricky. In fact,
  * after the second time we called `activate()` which is returning from
  * exception. But the first time we called `activate()` which is not returning
