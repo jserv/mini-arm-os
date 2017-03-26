@@ -70,7 +70,7 @@ Install additional utilities:
 - [STM32F429i-Discovery(physical devices)](http://www2.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-eval-tools/stm32-mcu-eval-tools/stm32-mcu-discovery-kits/32f429idiscovery.html)
   - [Details in Chinese by NCKU](http://wiki.csie.ncku.edu.tw/embedded/STM32F429)
   - STM32F429i-Discovery uses `USART1(Tx=PA9,Rx=PA10,baud rate=115200)` as default serial port here.
-    - You will a terminal emulator, such as `screen`
+    - You would need a terminal emulator, such as `screen`
       - Installation on Ubuntu / Debian based systems:
       `sudo apt-get install screen`
       - Then, attach the device file where a serial to USB converter is attached:
@@ -105,7 +105,7 @@ Install additional utilities:
     - Build "f429disco.bin" and flash the binary into STM32F429 with st-link.
   - `make erase`
     - Sometimes, STM32F429i-Discovery will not be able to flash new binary
-      file, then you will need to erase with st-link.
+      file, then you will need to erase flash memory with st-link.
     - Erase the entire flash on STM32F429.
   - `make gdb_ST-UTIL`
     - Using GDB with ST-LINK on STM32F429.
@@ -120,25 +120,25 @@ Install additional utilities:
 - cmsis
   - With cmsis,porting would be much easier!
 - release
-  - This directory will be create after "Target" in Makefile is called.
+  - This directory will be created after "Target" in Makefile is called.
   - Containing the elf,bin,objdump files in corresponding directory.
   - `make clean` will remove the entire directory,do not put personal files
     inside it!
 
 
 ## Porting Guide:
-You should know what [CMSIS](http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php) is, and why it saves us a lot of efforts.
+You should know what [CMSIS](http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php) is and why it saves us a lot of efforts.
 
 `cmsis` is a submodule from [JaredCJR/cmsis](https://github.com/JaredCJR/cmsis), maintained by Jia-Rung Chang.
 
-The full project can be divide intod two layer:
+The full project can be divided into two layer:
 - hardware-dependent part (HAL)
   - "platform" directory
 - hardware-indepentent part
   - "core" directory
 
 ## Steps to launch the kernel on real devices:
-**STEP 1**
+### STEP 1
 Select a target name for your device,such as `f429disco`.
 
 In this guide, we assume its name is `example_device` with vendor name "LPC".
@@ -149,10 +149,10 @@ directory in "cmsis" directory.
 Create "include" and "src" directory in `platform/example_device/`
 
 
-**STEP 2**
-Introducing your CMSIS for your target, where it should be in the [mbed repo](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis).
+### STEP 2
+Introducing your CMSIS for your target, where it should be in the [mbed repo](https://github.com/ARMmbed/mbed-os/tree/master/cmsis).
 
-For example, the CMSIS for STM32F429i-discovery could be found [here](https://github.com/mbedmicro/mbed/tree/master/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
+For example, the CMSIS for STM32F429i-discovery could be found [here](https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
 
 We only need ".h" files, do not copy any ".c" files.
 
@@ -162,13 +162,13 @@ Put the header files into `cmsis/LPCexample_device`.
 
 
 `NOTE:` 
-You may encounter some error message during building binary for your target.
-You need to sovle it mannually.
-Usually, it may be some file missing caused by some specific "define".
-You could just comment out that definition to solve the question.
+You may encounter some error messages during building binary for your target.
+You need to solve it mannually.
+Usually, some files may be missing caused by some specific "define".
+You could just comment out that definition to resolve this problem.
 
 
-**STEP 3**
+### STEP 3
 This is the most difficult part.
 
 You have to implement the files in `platform/example_device/include/` and
@@ -183,7 +183,7 @@ The function interface must be as same as the function interface in
 "platform/STM32F429/inc/" due to this is HAL for the entire project.
 
 
-**STEP 4**
+### STEP 4
 Add your target rules into Makefile.
 
 Please look the example `f429disco` in the Makefile.
@@ -193,10 +193,10 @@ variable/target name and knowing what gcc arguments suit your target!
 
 - `rules.mk` 
   - You should `NOT` modify this file!
-  - All of the rules are encapsulation into macro, used in `Makefile`.
+  - All of the rules are encapsulated into macro, used in `Makefile`.
 - `Makefile`:
   - If your device vendor name does not exist, create new variable and
-    assign name to it!
+    assign a name to it!
     - E.g.`STM32 := STM32`
   - Add your device name
     - E.g.`STM32F429_DEVICE := f429disco`
@@ -208,7 +208,7 @@ variable/target name and knowing what gcc arguments suit your target!
     device specific variable(device name,vendor name)
     - E.g. `$(eval $(call eval_all_variable,$(STM32F429_DEVICE),$(STM32)))`
     - The `vendor name` is used in the `cmsis` directory name. They must be
-      associated to each other.
+      associated with each other.
   - Use the predefined macro to produce the corresponding GCC commands
     - E.g.: `$(eval $(call eval_build_command,$(STM32F429_DEVICE)))`
     - This will derive lots of variables that you don't see in the `Makefile`.
@@ -218,7 +218,7 @@ variable/target name and knowing what gcc arguments suit your target!
     - E.g.: `$($(STM32F429_DEVICE)_TARGET)`
 
 
-**STEP 5**
+### STEP 5
 Congratulations!
 
 Now, you can try the "Available commands" in this README.
