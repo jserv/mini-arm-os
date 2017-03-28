@@ -103,7 +103,7 @@ int thread_create(void (*run)(void *), void *userdata)
 		stack[9] = (unsigned int) userdata;
 		stack[14] = (unsigned) &thread_self_terminal;
 		stack[15] = (unsigned int) run;
-		stack[16] = (unsigned int) 0x21000000; /* PSR Thumb bit */
+		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 	}
 
 	/* Construct the control block */
