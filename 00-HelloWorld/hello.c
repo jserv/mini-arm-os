@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "reg.h"
-
+/* cloud */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
 int puts(const char *str)
