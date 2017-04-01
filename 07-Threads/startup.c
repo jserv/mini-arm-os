@@ -62,7 +62,8 @@ void reset_handler(void)
 
 void default_handler(void)
 {
-	while (1);
+	while (1)
+		/* no operation */ ;
 }
 
 void nmi_handler(void) __attribute((weak, alias("default_handler")));

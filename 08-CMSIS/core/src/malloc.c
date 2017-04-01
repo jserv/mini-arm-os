@@ -28,7 +28,7 @@ static void *sbrk(unsigned int nbytes)
 		program_break += nbytes;
 		return (void *) previous_pb;
 	}
-	return (void *) - 1;
+	return (void *) -1;
 }
 
 void *malloc(unsigned int nbytes)
