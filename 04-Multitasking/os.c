@@ -47,29 +47,17 @@ void print_str(const char *str)
 #define THREAD_MSP	0xFFFFFFF9
 #define THREAD_PSP	0xFFFFFFFD
 
-/* Initialize user task stack and execute it one time */
-/* XXX: Implementation of task creation is a little bit tricky. In fact,
- * after the second time we called `activate()` which is returning from
- * exception. But the first time we called `activate()` which is not returning
- * from exception. Thus, we have to set different `lr` value.
- * First time, we should set function address to `lr` directly. And after the
- * second time, we should set `THREAD_PSP` to `lr` so that exception return
+/* Initialize user task stack and execute it one time.
+ * We set `THREAD_PSP` to `lr` so that exception return
  * works correctly.
  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
  */
 unsigned int *create_task(unsigned int *stack, void (*start)(void))
 {
-	static int first = 1;
-
 	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
-	if (first) {
-		stack[8] = (unsigned int) start;
-		first = 0;
-	} else {
-		stack[8] = (unsigned int) THREAD_PSP;
-		stack[15] = (unsigned int) start;
-		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
-	}
+	stack[8] = (unsigned int) THREAD_PSP;
+	stack[15] = (unsigned int) start;
+	stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 	stack = activate(stack);
 
 	return stack;

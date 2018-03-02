@@ -15,7 +15,6 @@ typedef struct {
 
 static tcb_t tasks[MAX_TASKS];
 static int lastTask;
-static int first = 1;
 
 /* FIXME: Without naked attribute, GCC will corrupt r7 which is used for stack
  * pointer. If so, after restoring the tasks' context, we will get wrong stack
@@ -64,13 +63,9 @@ void thread_start()
 	 */
 	asm volatile("mov r0, %0\n" : : "r" (tasks[lastTask].stack));
 	/* Load user task's context and jump to the task */
-	asm volatile("msr psp, r0\n"
-	             "mov r0, #3\n"
-	             "msr control, r0\n"
-	             "isb\n"
-	             "pop {r4-r11, lr}\n"
-	             "pop {r0}\n"
-	             "bx lr\n");
+	asm volatile("ldmia r0!, {r4-r11, lr}\n"
+                    "msr psp, r0\n"
+                    "bx lr\n");
 }
 
 int thread_create(void (*run)(void *), void *userdata)
@@ -94,17 +89,11 @@ int thread_create(void (*run)(void *), void *userdata)
 		return -1;
 
 	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
-	if (first) {
-		stack[8] = (unsigned int) run;
-		stack[9] = (unsigned int) userdata;
-		first = 0;
-	} else {
-		stack[8] = (unsigned int) THREAD_PSP;
-		stack[9] = (unsigned int) userdata;
-		stack[14] = (unsigned) &thread_self_terminal;
-		stack[15] = (unsigned int) run;
-		stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
-	}
+	stack[8] = (unsigned int) THREAD_PSP;
+	stack[9] = (unsigned int) userdata;
+	stack[14] = (unsigned) &thread_self_terminal;
+	stack[15] = (unsigned int) run;
+	stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
 
 	/* Construct the control block */
 	tasks[threadId].stack = stack;
