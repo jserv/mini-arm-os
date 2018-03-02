@@ -59,21 +59,14 @@ void delay(volatile int count)
 #define THREAD_MSP	0xFFFFFFF9
 #define THREAD_PSP	0xFFFFFFFD
 
-/* Initialize user task stack and execute it one time */
-
-/* XXX: Implementation of task creation is a little bit tricky.
- * We called `activate()` which is returning from exception.
- * At initial stage, we call `task_init()` to change from the
- * kernel mode into user mode, then switch to exception mode.
- * Thus, we can use the same way to initial the task. Don't have
- * to specially handle the first task. After initializing the
- * enviroment, we should set `THREAD_PSP` to `lr` to ensure that
- * exception return works correctly.
+/* Initialize user task stack and execute it one time.
+ * We set `THREAD_PSP` to `lr` to ensure that exception
+ * return works correctly.
  * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
  */
 unsigned int *create_task(unsigned int *stack, void (*start)(void))
 {
-	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
+	stack += STACK_SIZE - 17; /* End of stack, minus what we are about to push */
 	stack[8] = (unsigned int) THREAD_PSP;
 	stack[15] = (unsigned int) start;
 	stack[16] = (unsigned int) 0x01000000; /* PSR Thumb bit */
