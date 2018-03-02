@@ -88,7 +88,7 @@ int thread_create(void (*run)(void *), void *userdata)
 	if (stack == 0)
 		return -1;
 
-	stack += STACK_SIZE - 32; /* End of stack, minus what we are about to push */
+	stack += STACK_SIZE - 17; /* End of stack, minus what we are about to push */
 	stack[8] = (unsigned int) THREAD_PSP;
 	stack[9] = (unsigned int) userdata;
 	stack[14] = (unsigned) &thread_self_terminal;
