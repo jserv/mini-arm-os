@@ -101,9 +101,9 @@ Install additional utilities:
 **STM32F429i-Discovery(physical device)**
   - `make f429disco` or `make target PLAT=f429disco`
     - Build "f429disco.bin"
-  - `make flash`
+  - `make st-flash`
     - Build "f429disco.bin" and flash the binary into STM32F429 with st-link.
-  - `make erase`
+  - `make st-erase`
     - Sometimes, STM32F429i-Discovery will not be able to flash new binary
       file, then you will need to erase flash memory with st-link.
     - Erase the entire flash on STM32F429.
