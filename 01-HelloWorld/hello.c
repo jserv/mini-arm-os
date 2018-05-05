@@ -7,6 +7,8 @@
  */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
+char greet[] = "Hello World!\n";
+
 void print_str(const char *str)
 {
 	while (*str) {
@@ -33,7 +35,7 @@ void main(void)
 	*(USART2_CR3) = 0x00000000;
 	*(USART2_CR1) |= 0x2000;
 
-	print_str("Hello World!\n");
+	print_str(greet);
 
 	while (1);
 }
