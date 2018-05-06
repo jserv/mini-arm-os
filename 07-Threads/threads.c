@@ -16,9 +16,9 @@ typedef struct {
 static tcb_t tasks[MAX_TASKS];
 static int lastTask;
 
-/* FIXME: Without naked attribute, GCC will corrupt r7 which is used for stack
- * pointer. If so, after restoring the tasks' context, we will get wrong stack
- * pointer.
+/* Caution: Without naked attribute, GCC will normally push r7 which is used
+ * for stack pointer. If so, after restoring the tasks' context, we will get
+ * wrong stack pointer. PendSV handles calling convention itself.
  */
 void __attribute__((naked)) pendsv_handler()
 {
