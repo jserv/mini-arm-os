@@ -7,6 +7,14 @@
  */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
+/* greet is a global variable 
+ * This variable will be load by the loader at LMA and will be 
+ * copy to VMA by startup.c during startup. 
+ *
+ * Add a global variable greet instead of a string literal
+ * because string literal is in .rodata region and is put 
+ * under the .text region by the linker script
+ */
 static char greet[] = "Hello World!\n";
 
 void print_str(const char *str)
