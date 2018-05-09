@@ -7,7 +7,7 @@
  */
 #define USART_FLAG_TXE	((uint16_t) 0x0080)
 
-char greet[] = "Hello World!\n";
+static char greet[] = "Hello World!\n";
 
 void print_str(const char *str)
 {
