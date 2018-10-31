@@ -22,7 +22,7 @@ static int lastTask;
  */
 void __attribute__((naked)) pendsv_handler()
 {
-	/* Save the old task's context */
+	/* Save the old task's context[1]*/
 	asm volatile("mrs   r0, psp\n"
 	             "stmdb r0!, {r4-r11, lr}\n");
 	/* To get the task pointer address from result r0 */
@@ -49,23 +49,71 @@ void systick_handler()
 	*SCB_ICSR |= SCB_ICSR_PENDSVSET;
 }
 
-void thread_start()
+/* As PendSV does, this function also switches context and
+ * maintain assembly on its own. This avoids the compiler
+ * modifying register at prologue/epilogue sequences and
+ * corrupts inline-assembly usage.
+ */
+void __attribute__((naked)) thread_start()
 {
 	lastTask = 0;
 
-	/* Save kernel context */
-	asm volatile("mrs ip, psr\n"
-	             "push {r4-r11, ip, lr}\n");
-
+	/* Reset APSR before context switch.
+	 * Make sure we have a _clean_ PSR for the task.
+	 */
+	asm volatile("mov r0, #0\n"
+	             "msr APSR_nzcvq, r0\n");
 	/* To bridge the variable in C and the register in ASM,
 	 * move the task's stack pointer address into r0.
 	 * http://www.ethernut.de/en/documents/arm-inline-asm.html
 	 */
 	asm volatile("mov r0, %0\n" : : "r" (tasks[lastTask].stack));
-	/* Load user task's context and jump to the task */
-	asm volatile("ldmia r0!, {r4-r11, lr}\n"
-                    "msr psp, r0\n"
-                    "bx lr\n");
+	asm volatile("msr psp, r0\n"
+	             "mov r0, #3\n"
+	             "msr control, r0\n"
+	             "isb\n");
+	/* This is how we simulate stack handling that pendsv_handler
+	 * does. Thread_create sets 17 entries in stack, and the 9
+	 * entries we pop here will be pushed back in pendsv_handler
+	 * in the same order.
+	 *
+	 *
+	 *                      pop {r4-r11, lr}
+	 *                      ldr r0, [sp]
+	 *          stack
+	 *  offset -------
+	 *        |   16  | <- Reset value of PSR
+	 *         -------
+	 *        |   15  | <- Task entry
+	 *         -------
+	 *        |   14  | <- LR for task
+	 *         -------
+	 *        |  ...  |                             register
+	 *         -------                              -------
+	 *        |   9   | <- Task argument ---->     |   r0  |
+	 * psp after pop--<                             -------
+	 *        |   8   | <- EXC_RETURN    ---->     |   lr  |
+	 *         -------                              -------
+	 *        |   7   |                            |  r11  |
+	 *         -------                              -------
+	 *        |  ...  |                            |  ...  |
+	 *         -------                              -------
+	 *        |   0   |                            |   r4  |
+	 * psp ->  -------                              -------
+	 *
+	 * Instead of "pop {r0}", use "ldr r0, [sp]" to ensure consistent
+	 * with the way how PendSV saves _old_ context[1].
+	 */
+	asm volatile("pop {r4-r11, lr}\n"
+	             "ldr r0, [sp]\n");
+	/* Okay, we are ready to run first task, get address from
+	 * stack[15]. We just pop 9 register so #24 comes from
+	 * (15 - 9) * sizeof(entry of sp) = 6 * 4.
+	 */
+	asm volatile("ldr pc, [sp, #24]\n");
+
+	/* Never reach here */
+	while(1);
 }
 
 int thread_create(void (*run)(void *), void *userdata)
@@ -122,3 +170,14 @@ void thread_self_terminal()
 	/* And now wait for death to kick in */
 	while (1);
 }
+
+/* [1] Exception entry only saves R0-R4, R12, LR, PC and xPSR,
+ *     which means PendSV has to save other context (R4-R11) itself to
+ *     complete context switch.
+ *     Also, pushing LR (=EXC_RETURN) into thread stack before switching
+ *     task is needed in order to perform exception return next time the task
+ *     is selected to run.
+ *     Reference:
+ *         Cortex-M4 Devices: Generic User Guide (ARM DUI 0553A):
+ *         2.3.7 Exception entry and return
+ */

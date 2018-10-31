@@ -63,6 +63,15 @@ unsigned int *create_task(unsigned int *stack, void (*start)(void))
 	return stack;
 }
 
+/* After reset, processor is at thread and privileged mode.
+ * Switch to handler mode to ensure an appropriate exception return.
+ */
+void task_init(void)
+{
+	unsigned int empty[32];
+	task_init_env(empty + 32);
+}
+
 void task1_func(void)
 {
 	print_str("task1: Created!\n");
@@ -95,6 +104,7 @@ int main(void)
 	size_t current_task;
 
 	usart_init();
+	task_init();
 
 	print_str("OS: Starting...\n");
 	print_str("OS: First create task 1\n");
