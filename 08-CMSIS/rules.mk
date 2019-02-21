@@ -34,7 +34,7 @@ define uni_def_4
 #If DEVICE need CMSMS,assign new include directory list.
 $(foreach t,
           $(target_NOT_using_CMSIS_list),
-          ifneq ($(target_NOT_using_CMSIS_list),$(1)) 
+          ifneq (t,$(1)) 
                  $(1)_INC_DIR := $(CORE_HEADER_DIR) \
                                       $($(1)_DEPENDENT_HEADER_DIR) \
                                       $(CMSIS_DIR) \
@@ -44,7 +44,7 @@ $(foreach t,
 
 $(foreach t,
           $(target_using_CM4_list),
-          ifeq ($(target_using_CM4_list),$(1))
+          ifeq (t,$(1))
                 $(1)_CPU := $(CORTEX_M4)
           else
                 $(1)_CPU := $(CORTEX_M3)
