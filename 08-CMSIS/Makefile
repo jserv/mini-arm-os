@@ -67,6 +67,10 @@ openocd:
 		   -c "arm semihosting enable" \
 		   -c "reset run"
 
+screen:
+	screen /dev/ttyUSB0 115200 8n1
+	
+
 gdb-oocd: $($(STM32F429_DEVICE)_TARGET_elf)
 	arm-none-eabi-gdb $^ -ex "target remote:3333"
 
