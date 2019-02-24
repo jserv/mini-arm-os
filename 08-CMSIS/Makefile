@@ -43,11 +43,11 @@ $($(1)_TARGET):
 endef
 
 #Create corresponding build command to the device
-$(eval $(call eval_build_command,$(STM32P103_DEVICE)))
+# $(eval $(call eval_build_command,$(STM32P103_DEVICE)))
 $(eval $(call eval_build_command,$(STM32F429_DEVICE)))
 
 #default target
-PLAT ?= $(STM32P103_DEVICE)
+PLAT ?= $(STM32F429_DEVICE)
 
 .PHONY:all target clean cscope astyle st-flash st-erase
 
@@ -68,7 +68,7 @@ openocd:
 		   -c "reset run"
 
 screen:
-	screen /dev/ttyUSB0 115200 8n1
+	sudo screen /dev/ttyACM0 115200
 	
 
 gdb-oocd: $($(STM32F429_DEVICE)_TARGET_elf)

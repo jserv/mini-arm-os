@@ -9,6 +9,10 @@
                    stream_write(USART,x);  \
                 }while(0)
 
+#define gets(x, y) do {                         \
+                    stream_read(USART, x, y);   \
+                }while(0)
+
 static void delay(volatile int count)
 {
 	count *= 25000;
@@ -19,15 +23,23 @@ static void delay(volatile int count)
 static void busy_loop(void *str)
 {
 	while (1) {
-		puts(str);
-		puts(": Running...\r\n");
+		// puts(str);
+		// puts(": Running...\r\n");
 		delay(RECOMMAND_TIME_INTERVAL);
 	}
 }
 
 void test1(void *userdata)
 {
-	busy_loop(userdata);
+    int buf_size = 100;
+    char buf[buf_size];
+	while (1) {
+		puts("Enter command1: \r\n");
+        gets(buf, buf_size);
+        puts("The string you enter is: ");
+        puts(buf);
+        
+	}
 }
 
 void test2(void *userdata)
@@ -53,7 +65,7 @@ int main(void)
 	if (thread_create(test2, (void *) str2) == -1) {
 		puts("Thread 2 creation failed\r\n");
 	}
-
+    
 	if (thread_create(test3, (void *) str3) == -1) {
 		puts("Thread 3 creation failed\r\n");
 	}
