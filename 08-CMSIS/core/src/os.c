@@ -5,17 +5,10 @@
 #include "threads.h"
 #include "stream.h"
 
-#define puts(x) do {                       \
-                   stream_write(USART,x);  \
-                }while(0)
 
-#define gets(x, y) do {                         \
-                    stream_read(USART, x, y);   \
-                }while(0)
 
 static void delay(volatile int count)
 {
-	count *= 25000;
 	while (count--) {
 	}
 }
@@ -36,9 +29,13 @@ void test1(void *userdata)
 	while (1) {
 		puts("Enter command1: \r\n");
         gets(buf, buf_size);
-        puts("The string you enter is: ");
-        puts(buf);
-        
+		// delay(180000000);
+        asm volatile (
+            "svc #0"
+        );
+        asm volatile (
+            "svc #1"
+        );
 	}
 }
 

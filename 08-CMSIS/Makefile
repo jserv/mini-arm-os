@@ -5,7 +5,7 @@ CORTEX_M3 := -mcpu=cortex-m3
 CORTEX_M4 := -mcpu=cortex-m4
 CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 	 -gdwarf-2 -g3 -Wall -Werror \
-	 	 -mthumb 
+	 	 -mthumb -Wno-unused-variable
 
 #devices vendor
 STM32 := STM32
@@ -43,8 +43,8 @@ $($(1)_TARGET):
 endef
 
 #Create corresponding build command to the device
-# $(eval $(call eval_build_command,$(STM32P103_DEVICE)))
 $(eval $(call eval_build_command,$(STM32F429_DEVICE)))
+$(eval $(call eval_build_command,$(STM32P103_DEVICE)))
 
 #default target
 PLAT ?= $(STM32F429_DEVICE)

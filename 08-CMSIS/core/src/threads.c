@@ -3,6 +3,8 @@
 #include "config.h"
 #include "malloc.h"
 #include "reg.h"
+#include "stream.h"
+#include "stdlib.h"
 
 #define THREAD_PSP	0xFFFFFFFD
 
@@ -11,10 +13,84 @@ typedef struct {
 	void *stack;
 	void *orig_stack;
 	uint8_t in_use;
+	int32_t pid;
 } tcb_t;
 
 static tcb_t tasks[MAX_TASKS];
 static int lastTask;
+
+// Calling convention: https://stackoverflow.com/questions/261419/what-registers-to-save-in-the-arm-c-calling-convention
+// Exception entry and return: in Cortex-M user guide
+// Stacking: in Cortex-M technical Manual
+/*
+ *	This is automatical stacking after exception 
+ *	Note LR is indirect
+ *	 
+ *         -------
+ *        |  prev | <- old SP
+ *         -------
+ *        |  xPSR | 
+ *         -------
+ *        |   PC  | 
+ *         -------
+ *        |   LR  |                          
+ *         -------    
+ *        |  r12  | 
+ *         -------
+ *        |   r3  | 
+ *         -------
+ *        |   r2  |  
+ *         -------
+ *        |   r1  |                             
+ *         ------- 
+ *        |   r0  | <- SP                            
+ *         -------                                         
+ * 		For EXC_RETURN
+ * 
+ * 		0xFFFFFFF1	0001
+ *		Return to Handler mode.
+ *
+ *		Exception return gets state from the main stack.
+ *
+ *		Execution uses MSP after return.
+ *
+ *		0xFFFFFFF9	1001
+ *		Return to Thread mode.
+ *
+ *		Exception return gets state from MSP.
+ *
+ *		Execution uses MSP after return.
+ *
+ *		0xFFFFFFFD	1101
+ *		Return to Thread mode.
+ *
+ *		Exception return gets state from PSP.
+ *
+ *		Execution uses PSP after return.
+ */
+
+
+void  svc_handler()
+{
+	// get svc number, which is next to PC
+	int svc = -1;
+	asm volatile (
+		"tst	lr, 0x3\n" 
+		"ite	eq\n"
+		"mrseq	r0, msp\n"
+		"mrsne	r0, psp\n"
+		"ldr	r1, [r0, #24]\n" 
+		"ldrb	%[svc], [r1, -2]"
+		: [svc] "+rm" (svc)
+	);
+	puts("received svc :");
+	char s[10];
+	itoa(svc, s); 
+	puts(s);
+	puts("\r\n");
+	return;
+	
+}
 
 /* Caution: Without naked attribute, GCC will normally push r7 which is used
  * for stack pointer. If so, after restoring the tasks' context, we will get
