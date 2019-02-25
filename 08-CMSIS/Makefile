@@ -59,7 +59,7 @@ target:
 st-flash: $($(STM32F429_DEVICE)_TARGET)
 	st-flash --reset write $($(STM32F429_DEVICE)_TARGET_bin) 0x8000000
 
-openocd:
+connect-oocd:
 	sudo openocd -f board/stm32f429discovery.cfg  \
 		   -l /tmp/openocd.log 	\
 			-c "init"                   \
@@ -71,8 +71,8 @@ screen:
 	sudo screen /dev/ttyACM0 115200
 	
 
-gdb-oocd: $($(STM32F429_DEVICE)_TARGET_elf)
-	arm-none-eabi-gdb $^ -ex "target remote:3333"
+load-gdb: $($(STM32F429_DEVICE)_TARGET_elf)
+	arm-none-eabi-gdb $^ -ex "target remote:3333" 
 
 st-erase:
 	st-flash erase
