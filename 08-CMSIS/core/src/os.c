@@ -9,33 +9,33 @@
 
 static void delay(volatile int count)
 {
-	while (count--) {
-	}
+	while (count--)
+		;
 }
 
 static void busy_loop(void *str)
 {
 	while (1) {
-		// puts(str);
-		// puts(": Running...\r\n");
 		delay(RECOMMAND_TIME_INTERVAL);
 	}
 }
 
 void test1(void *userdata)
 {
-    int buf_size = 100;
-    char buf[buf_size];
+	int buf_size = 100;
+	char buf[buf_size];
 	while (1) {
 		puts("Enter command1: \r\n");
-        gets(buf, buf_size);
-		// delay(180000000);
-        asm volatile (
-            "svc #0"
-        );
-        asm volatile (
-            "svc #1"
-        );
+		gets(buf, buf_size);
+		puts("The command you entered is: ");
+		puts(buf);
+		puts("\r\n")
+		asm volatile(
+		    "svc #0"
+		);
+		asm volatile(
+		    "svc #1"
+		);
 	}
 }
 
@@ -62,7 +62,7 @@ int main(void)
 	if (thread_create(test2, (void *) str2) == -1) {
 		puts("Thread 2 creation failed\r\n");
 	}
-    
+
 	if (thread_create(test3, (void *) str3) == -1) {
 		puts("Thread 3 creation failed\r\n");
 	}

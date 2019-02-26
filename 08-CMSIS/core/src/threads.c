@@ -23,30 +23,30 @@ static int lastTask;
 // Exception entry and return: in Cortex-M user guide
 // Stacking: in Cortex-M technical Manual
 /*
- *	This is automatical stacking after exception 
+ *	This is automatical stacking after exception
  *	Note LR is indirect
- *	 
+ *
  *         -------
  *        |  prev | <- old SP
  *         -------
- *        |  xPSR | 
+ *        |  xPSR |
  *         -------
- *        |   PC  | 
+ *        |   PC  |
  *         -------
- *        |   LR  |                          
- *         -------    
- *        |  r12  | 
+ *        |   LR  |
  *         -------
- *        |   r3  | 
+ *        |  r12  |
  *         -------
- *        |   r2  |  
+ *        |   r3  |
  *         -------
- *        |   r1  |                             
- *         ------- 
- *        |   r0  | <- SP                            
- *         -------                                         
+ *        |   r2  |
+ *         -------
+ *        |   r1  |
+ *         -------
+ *        |   r0  | <- SP
+ *         -------
  * 		For EXC_RETURN
- * 
+ *
  * 		0xFFFFFFF1	0001
  *		Return to Handler mode.
  *
@@ -74,22 +74,22 @@ void  svc_handler()
 {
 	// get svc number, which is next to PC
 	int svc = -1;
-	asm volatile (
-		"tst	lr, 0x3\n" 
-		"ite	eq\n"
-		"mrseq	r0, msp\n"
-		"mrsne	r0, psp\n"
-		"ldr	r1, [r0, #24]\n" 
-		"ldrb	%[svc], [r1, -2]"
-		: [svc] "+rm" (svc)
+	asm volatile(
+	    "tst	lr, 0x3\n"
+	    "ite	eq\n"
+	    "mrseq	r0, msp\n"
+	    "mrsne	r0, psp\n"
+	    "ldr	r1, [r0, #24]\n"
+	    "ldrb	%[svc], [r1, -2]"
+	    : [svc] "+rm"(svc)
 	);
 	puts("received svc :");
 	char s[10];
-	itoa(svc, s); 
+	itoa(svc, s);
 	puts(s);
 	puts("\r\n");
 	return;
-	
+
 }
 
 /* Caution: Without naked attribute, GCC will normally push r7 which is used
@@ -185,7 +185,7 @@ void __attribute__((naked)) thread_start()
 	asm volatile("ldr pc, [sp, #24]\n");
 
 	/* Never reach here */
-	while(1);
+	while (1);
 
 }
 
