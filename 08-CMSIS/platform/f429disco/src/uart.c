@@ -249,7 +249,7 @@ static void enableUART(void)
 	 */
 	USART1->CR1 |= USART_CR1_UE;
 	USART1->CR1 |= USART_CR1_RE;
-	
+
 }
 
 
@@ -288,20 +288,20 @@ int uart_read(char *buf, int buf_size)
 	// busy waiting and read if has data
 	char *p = buf - 1;
 	int nread;
-	do{
+	do {
 		p++;
-		
-		while(!(USART1->SR & USART_SR_RXNE))
+
+		while (!(USART1->SR & USART_SR_RXNE))
 			;
 		*p = USART1->DR & 0x7f;
 		while (!(USART1->SR & USART_SR_TXE))
 			;
 		USART1->DR = *p;
 		nread = p - buf + 1;
-	}while(*p != '\r' && nread < buf_size-2);
+	} while (*p != '\r' && nread < buf_size - 2);
 	uart_putc('\n');
-	
-	*(p+1) = '\n';
-	*(p+2) = '\0';
+
+	*(p + 1) = '\n';
+	*(p + 2) = '\0';
 	return nread;
 }
