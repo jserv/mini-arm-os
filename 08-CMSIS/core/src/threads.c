@@ -103,7 +103,7 @@ void __attribute__((naked)) thread_start()
 	asm volatile("pop {r4-r11, lr}\n"
 	             "ldr r0, [sp]\n");
 	/* Okay, we are ready to run first task, get address from
-	 * stack[15]. We just pop 10 register so #24 comes from
+	 * stack[15]. We just pop 9 register so #24 comes from
 	 * (15 - 9) * sizeof(entry of sp) = 6 * 4.
 	 */
 	asm volatile("ldr pc, [sp, #24]\n");
