@@ -36,7 +36,7 @@ Steps
 * `07-Threads`
   - Implement user-level threads
 * `08-CMSIS`
-  - Illustrate hardware abstration layer (HAL) by introducing CMSIS
+  - Illustrate hardware abstraction layer (HAL) by introducing CMSIS
   - Both emulator (based on stm32-p103) and real device (STM32F429i discovery)
     are supported.
 
