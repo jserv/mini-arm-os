@@ -28,3 +28,7 @@ void uart_write(const char *str)
 	}
 }
 
+int uart_read(char *buf, int size)
+{
+	return 0;
+}

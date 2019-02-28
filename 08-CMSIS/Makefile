@@ -5,7 +5,7 @@ CORTEX_M3 := -mcpu=cortex-m3
 CORTEX_M4 := -mcpu=cortex-m4
 CFLAGS = -fno-common -ffreestanding -O0 -std=gnu99 \
 	 	 -gdwarf-2 -g3 -Wall -Werror \
-	 	 -mthumb 
+	 	 -mthumb -Wno-unused-variable
 
 #devices vendor
 STM32 := STM32
@@ -43,11 +43,11 @@ $($(1)_TARGET):
 endef
 
 #Create corresponding build command to the device
-$(eval $(call eval_build_command,$(STM32P103_DEVICE)))
 $(eval $(call eval_build_command,$(STM32F429_DEVICE)))
+$(eval $(call eval_build_command,$(STM32P103_DEVICE)))
 
 #default target
-PLAT ?= $(STM32P103_DEVICE)
+PLAT ?= $(STM32F429_DEVICE)
 
 .PHONY:all target clean cscope astyle st-flash st-erase
 
@@ -58,6 +58,21 @@ target:
 
 st-flash: $($(STM32F429_DEVICE)_TARGET)
 	st-flash --reset write $($(STM32F429_DEVICE)_TARGET_bin) 0x8000000
+
+
+oocd:
+	sudo openocd -f board/stm32f429discovery.cfg  \
+		   -l /tmp/openocd.log 	\
+			-c "init"                   \
+		   -c "reset init"             \
+		   -c "arm semihosting enable" \
+		   -c "reset run"
+
+screen:
+	sudo screen /dev/ttyACM0 115200
+	
+gdb-oocd: $($(STM32F429_DEVICE)_TARGET_elf)
+	arm-none-eabi-gdb $^ -ex "target remote:3333" 
 
 st-erase:
 	st-flash erase
@@ -94,4 +109,3 @@ astyle:
 
 clean:
 	rm -rf $(RELEASE_DIR)
-
