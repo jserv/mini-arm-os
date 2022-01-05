@@ -129,7 +129,7 @@ Install additional utilities:
 ## Porting Guide:
 You should know what [CMSIS](http://www.arm.com/products/processors/cortex-m/cortex-microcontroller-software-interface-standard.php) is and why it saves us a lot of efforts.
 
-`cmsis` is a submodule from [JaredCJR/cmsis](https://github.com/JaredCJR/cmsis), maintained by Jia-Rung Chang.
+`cmsis` is a submodule from [TibaChang/cmsis](https://github.com/TibaChang/cmsis), maintained by Jia-Rung Chang.
 
 The full project can be divided into two layer:
 - hardware-dependent part (HAL)
@@ -139,11 +139,11 @@ The full project can be divided into two layer:
 
 ## Steps to launch the kernel on real devices:
 ### STEP 1
-Select a target name for your device,such as `f429disco`.
+Select a target name for your device, such as `f429disco`.
 
-In this guide, we assume its name is `example_device` with vendor name "LPC".
+In this guide, we assume its name is `example_device` with vendor name "f429disco".
 
-Create `example_device` directory in "platform" and `LPCexample_device`
+Create `example_device` directory in "platform" and `f429disco`
 directory in "cmsis" directory.
 
 Create "include" and "src" directory in `platform/example_device/`
@@ -152,14 +152,13 @@ Create "include" and "src" directory in `platform/example_device/`
 ### STEP 2
 Introducing your CMSIS for your target, where it should be in the [mbed repo](https://github.com/ARMmbed/mbed-os/tree/master/cmsis).
 
-For example, the CMSIS for STM32F429i-discovery could be found [here](https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM/TARGET_STM32F4/TARGET_DISCO_F429ZI).
+For example, the CMSIS for STM32F429i-discovery could be found [here](https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM/TARGET_STM32F4/TARGET_STM32F429xI).
 
 We only need ".h" files, do not copy any ".c" files.
 
-Put the header files into `cmsis/LPCexample_device`.
+Put the header files into `cmsis/f429discoexample_device`.
 
-[cmsis](https://github.com/JaredCJR/cmsis) is a submodule in this project,maintianed by [Jia-Rung Chang](https://github.com/JaredCJR).
-
+[cmsis](https://github.com/TibaChang/cmsis) is a submodule in this project, maintianed by [Tiba Chang](https://github.com/TibaChang).
 
 `NOTE:` 
 You may encounter some error messages during building binary for your target.
